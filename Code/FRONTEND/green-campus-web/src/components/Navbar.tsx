@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import FitnessCenterOutlinedIcon from "@mui/icons-material/FitnessCenterOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
 const NavbarLink: React.FC<{
   to: string;
@@ -17,7 +17,7 @@ const NavbarLink: React.FC<{
 
   return (
     <li
-      className={`${className} relative list-none font-roboto my-auto px-6 py-3 rounded-3xl text-light-primary ${
+      className={`${className} relative list-none font-roboto my-auto px-6 py-3 rounded-2xl text-light-primary ${
         currentPage === to && `bg-primary`
       }`}
       onClick={onClick}
@@ -57,15 +57,13 @@ const Navbar = () => {
   };
 
   return (
-    <div
-      className="relative bg-dark-primary"
-      onMouseOver={handleMouseOver}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="relative bg-black">
       <div
-        className={`navbar relative flex flex-col justify-between bg-dark-primary h-screen py-10 transition-all duration-500 ease-in-out ${
+        className={`navbar ml-2 mb-2 relative flex flex-col rounded-2xl justify-between bg-dark-primary h-screen py-10 transition-all duration-500 ease-in-out ${
           isNavbarExpanded ? "w-40" : "w-20"
         }`}
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
       >
         <div className="relative mx-auto">
           <ul className="py-5 ">

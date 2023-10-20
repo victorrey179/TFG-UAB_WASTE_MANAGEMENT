@@ -10,10 +10,10 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="relative flex text-light-primary">
+    <div className="relative flex text-light-primary bg-black">
       <Navbar />
       <main className="overflow-y-hidden h-screen w-full bg-black">
-        <div className="m-4">{children}</div>
+        <div className="ml-2 mr-2">{children}</div>
       </main>
     </div>
   );
