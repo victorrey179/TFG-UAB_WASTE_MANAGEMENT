@@ -1,9 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
-
+import { useAuth } from "../contexts/AuthContext";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import FitnessCenterOutlinedIcon from "@mui/icons-material/FitnessCenterOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
@@ -18,7 +16,7 @@ const NavbarLink: React.FC<{
   return (
     <li
       className={`${className} relative list-none font-roboto my-auto px-6 py-3 rounded-2xl text-light-primary ${
-        currentPage === to && `bg-primary`
+        currentPage === to && to !== '/profile' && `bg-primary`
       }`}
       onClick={onClick}
     >
@@ -30,10 +28,9 @@ const NavbarLink: React.FC<{
 };
 
 const Navbar = () => {
-  const [isSubmenuOpen, setSubmenuOpen] = useState(false);
-  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [isNavbarExpanded, setIsNavbarExpanded] = useState(true);
   const shrinkTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const { user } = useAuth();
 
   const handleMouseOver = () => {
     if (shrinkTimerRef.current) {
@@ -67,7 +64,7 @@ const Navbar = () => {
       >
         <div className="relative mx-auto">
           <ul className="py-5 ">
-            <NavbarLink to="/">
+            <NavbarLink to="/home">
               <HomeOutlinedIcon
                 fontSize="small"
                 className="text-light-primary"
@@ -77,30 +74,37 @@ const Navbar = () => {
               )}
             </NavbarLink>
             <hr className="my-3 border-transparent text-light-primary" />
-            <li>
-              <NavbarLink to="/map">
-                <MapOutlinedIcon
-                  fontSize="small"
-                  className="text-light-primary"
-                />
-                {isNavbarExpanded && (
-                  <span className="text-light-primary">Mapa</span>
-                )}
-              </NavbarLink>
-            </li>
+            <NavbarLink to="/map">
+              <MapOutlinedIcon
+                fontSize="small"
+                className="text-light-primary"
+              />
+              {isNavbarExpanded && (
+                <span className="text-light-primary">Mapa</span>
+              )}
+            </NavbarLink>
           </ul>
         </div>
-        <div className="relative mx-auto flex flex-col gap-4">
-          {/* <div className="profile-btn relative mx-auto  bg-light-primary dark:bg-dark-primary h-16 w-16 rounded-full items-center flex justify-center">
-            <ChatOutlinedIcon />
-          </div> */}
+        <div className="relative mx-auto flex flex-row items-center">
           <NavbarLink to="/profile">
-            <AccountCircleOutlinedIcon
-              fontSize="small"
-              className="text-light-primary"
-            />
+            {user && user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt={`${user.displayName}`}
+                className="rounded-full w-8 h-8" // Ajusta el tamaño según sea necesario
+              />
+            ) : (
+              <AccountCircleOutlinedIcon
+                fontSize="small"
+                className="text-light-primary"
+              />
+            )}
             {isNavbarExpanded && (
-              <span className="text-light-primary">Perfil</span>
+              <div className="w-20 truncate text-center">
+                <h1 className="text-sm text-light-primary">
+                  {user ? user.displayName : "Perfil"}
+                </h1>
+              </div>
             )}
           </NavbarLink>
         </div>

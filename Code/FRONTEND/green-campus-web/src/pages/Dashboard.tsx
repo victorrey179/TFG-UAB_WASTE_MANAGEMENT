@@ -2,13 +2,6 @@ import React, { useState } from "react";
 import Layout from "../components/Layout";
 
 const Dashboard: React.FC = () => {
-  const [tasks, setTasks] = useState<string[]>([
-    "Tarea 1",
-    "Tarea 2",
-    "Tarea 3",
-  ]);
-  const [filter, setFilter] = useState<string>("Todas");
-
   return (
     <Layout>
       <div className="flex h-screen w-full mt-2 mb-2 gap-2">

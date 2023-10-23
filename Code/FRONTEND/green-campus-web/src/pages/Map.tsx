@@ -240,12 +240,12 @@ const Map: React.FC = () => {
           console.error("Error obteniendo la ubicación: ", error);
           // En caso de error o si el usuario no otorga permisos,
           // puedes establecer una ubicación predeterminada.
-          setCenter({ lat: 41.3851, lng: 2.1734 });
+          setCenter({ lat: 41.3851, lng: 2.19 });
         }
       );
     } else {
       // La geolocalización no está disponible, establece una ubicación predeterminada
-      setCenter({ lat: 41.3851, lng: 2.1734 });
+      setCenter({ lat: 41.3851, lng: 2.19 });
     }
   }, []);
 
