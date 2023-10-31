@@ -1,0 +1,13 @@
+{
+    "type": "service_account",
+    "project_id": "resonant-goods-402508",
+    "private_key_id": "a18aad10fe11313c4e56bf73b1c7422469799277",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDMEMMrQb+jQ3H/\nhiuy8ldiXN60g+UvvpBxq8rLCnh/zCI2JI6dPZ84cTbBwDzsgRZeZMG0opZ1V2zE\nOHer8XC3Zkzi71ZEcOkliyPN/QyHscE8/ItrA1N0wAF1KAcH8pppIHiM2AaLhkTD\nbzreOuxRYoSPAD5G/1U33IpxkJe+VZW0wknsh7zObdJ0tT7IQA25q/lMNDfKm/+H\n+Rq/0FkXX7wjRZyVTKnfeBijqGSRHBjLqyHRVv+kpniP24G4GCgvNEJYuej/7oX7\nZ30mMPPPrSO6oC0EbHhuLo8EYJ6MLTkhqOLmwKpB16QRomtXI2y7OsnyzeeWPZPx\nN77jHY1VAgMBAAECggEAErT0rJ9QieRxwQq+hcnZKzoNQRTC6qS4XsXwsg/0f5lU\nh4xutckY3VaPk6UOULX9ZCDYxbjj5xThHSnPWqf9p7+34P6Eyi25nx30EHrtQ6E5\ncDWh3ZOxT7IW+sj1FWGZjcqSvS1D3arXhzzynhMJEpA1S7CqL4hST8EmwIYQoGYp\nGAM6WCrmN5KfZOPuXkD6ngxRUSNDDbqP8ydTjCXKmzsvZnTzmZsqP3fxmnHb2eKp\nRd7iuhmvZ88BvW/oaIBpn3ueSN34lA/7be1mS0Vpd2hHMecuixYJqGJ+8LIjlEii\nRdquNjEQrnjYFQ9igphrCHc/We+o4X6Z++kP8gD9nwKBgQD2CZgLbcV2MipXAqHy\nHx3veI59wccFkj9kn/L2acC/WRW18cY9Z979QZ89evxxdSvy3Bp+GGbRyiUwtEp6\n1ON/jzgn2b57XlxtKTeu9jT5v26DFVhU2xs3EWup5BVxs14SrCue3ObfRahCzmy7\n9WGf/xZfcLlUOnluySfQf0KC5wKBgQDUVBcBFTjnGybib5jhkj5TN/34ag2RoG1Z\nyZhU8wotmkcK/PbmgfUZLw6tiMhQ5Ik+Lhx6Snc6OabuvTT6vXlijjhLXUmHjSoe\niOct/4irF3MetbLAKsUTcCSNgnr1doSLAd3DRCqWvgzMe6u1IpxL62vjwAA3IJ2g\nLI5DzuPiYwKBgQDYo3X3ij52ZpGVb8H9GZ0YQQTmgnul0jJzfctHYbLQSbauMCcn\n5pAYW3HFhsdFd7Cs9VV2djICw4WfrwBty4pNxWPi4v2wT1P+4m4fZrcauY6raV4P\nyaXbBUHRo/2l0hQhSOxXw5aePg18VZq0ncnKQagHfZASNDK8c+7UzVlZPQKBgQC0\njIzDLvikDEKUabDmnyTAPuyHQCcpnfFeWD5gfgo5nOasQU7x07BHKeyhQ56SqsLJ\nTQyKMKgRqtR4Tguu6088rxLPgxPzX+Zg8KkkRBZC5j3N71OAdN4AGWv7qOhFsfIj\nAgNA98X/SLw5ZTAtZrDhHd8wWyPTvLhMa5bNsi+1YQKBgQD0UxZ1GEX/FvD0iEUI\nO4C4h7XGtQjteAHYolHpf9cwsOIk1hKi2/HzfL+57tJ9RHRARccrDEcW5SXKIQl5\nKQqa7aTrIwtJAXg5iuwbdpWGHIHK2CPd6utIaqxngDr4a2ejsWEZGX3FedhZTgVj\nZOF4AKS30bLphalqMbHx1LBJLg==\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-uvy08@resonant-goods-402508.iam.gserviceaccount.com",
+    "client_id": "102917360490951486476",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-uvy08%40resonant-goods-402508.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+}
