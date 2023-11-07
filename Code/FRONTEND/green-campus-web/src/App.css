@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+.loading-container {
+  width: 100%; /* Ocupa todo el ancho del contenedor padre */
+  height: 100%; /* Ocupa todo el alto del contenedor padre */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(45deg, #181818, #242424, #181818, #242424);
+  background-size: 400% 400%;
+  animation: gradient 1s ease infinite;
+}

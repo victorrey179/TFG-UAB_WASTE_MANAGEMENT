@@ -1,0 +1,52 @@
+{
+  "subtitle": {
+    "text": "El software para la gestión de residuos inteligentes."
+  },
+  "initButton": {
+    "text": "Comenzar"
+  },
+  "languageButton": {
+    "text": "Idioma"
+  },
+  "language": {
+    "es": "Español",
+    "ca": "Catalán",
+    "en": "Inglés"
+  },
+  "aboutUsButton": {
+    "text": "Sobre nosotros"
+  },
+  "servicesButton": {
+    "text": "Que ofrecemos"
+  },
+  "loginPageButton": {
+    "text": "¡Empecemos!"
+  },
+  "loginPage": {
+    "title": "Inicio de sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "loginButton": "Iniciar sesión",
+    "loginGoogleButton": "Continuar con Google",
+    "noAcount": "¿No tienes una cuenta?"
+  },
+  "registerPage": {
+    "title": "Registrarse",
+    "name": "Nombre",
+    "surname": "Apellido/s",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "repeatPassword": "Repetir contraseña",
+    "address" : "Dirección",
+    "city" : "Ciudad",
+    "country" : "País",
+    "phone": "Teléfono",
+    "postalCode" : "Código postal",
+    "registerButton": "Crear cuenta",
+    "yesAcount": "¿Ya tienes una cuenta?"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "map": "Mapa"
+  }
+}

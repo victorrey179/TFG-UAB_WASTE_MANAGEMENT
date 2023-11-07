@@ -34,7 +34,7 @@ void loop() {
   
   duration = pulseIn(echoPin, HIGH);
   distance = duration / 58.2;
-  
+
   Serial.print("Distancia: ");
   Serial.print(String(distance));
   Serial.print(" cm");

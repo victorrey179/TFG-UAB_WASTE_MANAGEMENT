@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const NavbarLink: React.FC<{
   to: string;
@@ -31,6 +32,7 @@ const Navbar = () => {
   const [isNavbarExpanded, setIsNavbarExpanded] = useState(true);
   const shrinkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
+  const { text } = useLanguage();
 
   const handleMouseOver = () => {
     if (shrinkTimerRef.current) {
@@ -56,7 +58,7 @@ const Navbar = () => {
   return (
     <div className="relative bg-black">
       <div
-        className={`navbar ml-2 mb-2 relative flex flex-col rounded-2xl justify-between bg-dark-primary h-screen py-10 transition-all duration-500 ease-in-out ${
+        className={`navbar ml-4 relative flex flex-col rounded-2xl justify-between bg-dark-primary h-screen py-8 transition-all duration-500 ease-in-out ${
           isNavbarExpanded ? "w-40" : "w-20"
         }`}
         onMouseOver={handleMouseOver}
@@ -70,7 +72,7 @@ const Navbar = () => {
                 className="text-light-primary"
               />
               {isNavbarExpanded && (
-                <span className="text-light-primary">Inicio</span>
+                <span className="text-light-primary">{text("navbar.home")}</span>
               )}
             </NavbarLink>
             <hr className="my-3 border-transparent text-light-primary" />
@@ -80,7 +82,7 @@ const Navbar = () => {
                 className="text-light-primary"
               />
               {isNavbarExpanded && (
-                <span className="text-light-primary">Mapa</span>
+                <span className="text-light-primary">{text("navbar.map")}</span>
               )}
             </NavbarLink>
           </ul>

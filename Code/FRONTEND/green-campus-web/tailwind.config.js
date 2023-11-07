@@ -17,7 +17,7 @@ module.exports = {
         'dark-gray': '#181818',
         blue: '#00396F',
         red: '#9F4848',
-        'primary-orange': '#BC7532',
+        'primary-blue': '#394c9a',
         gray: '#242424',
         green: '#52A045',
         yellow: '#A4A701' // Reemplaza esto con tu color hexadecimal
@@ -34,6 +34,7 @@ module.exports = {
         green: '#52A045',
         yellow: '#A4A701',
         red: '#9F4848',
+        brown: '#5A3A3A'
       },
       text: {
         orange: '#f39200',

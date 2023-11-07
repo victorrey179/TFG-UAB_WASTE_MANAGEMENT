@@ -1,0 +1,52 @@
+{
+  "subtitle": {
+    "text": "El software per a la gestió intel·ligent de residus."
+  },
+  "initButton": {
+    "text": "Començar"
+  },
+  "languageButton": {
+    "text": "Idioma"
+  },
+  "language": {
+    "es": "Espanyol",
+    "ca": "Català",
+    "en": "Anglès"
+  },
+  "aboutUsButton": {
+    "text": "Sobre nosaltres"
+  },
+  "servicesButton": {
+    "text": "Que oferim"
+  },
+  "loginPageButton": {
+    "text": "Començem!"
+  },
+  "loginPage": {
+    "title": "Inici de sessió",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "loginButton": "Iniciar sessió",
+    "loginGoogleButton": "Continuar amb Google",
+    "noAcount": "No tens un compte?"
+  },
+  "registerPage": {
+    "title": "Registre",
+    "name": "Nom",
+    "surname": "Cognom/s",
+    "email": "Correu electrònic",
+    "password": "Contrasenya",
+    "repeatPassword": "Repeteix la contrasenya",
+    "address" : "Adreça",
+    "city" : "Ciutat",
+    "country" : "País",
+    "phone": "Telèfon",
+    "postalCode" : "Codi postal",
+    "registerButton": "Registrar-se",
+    "yesAcount": "Ja tens un compte?"
+  },
+  "navbar": {
+    "home": "Inici",
+    "map": "Mapa"
+  }
+}

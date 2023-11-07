@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import Layout from "../components/Layout";
 import { GridLoader } from "react-spinners";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Map: React.FC = () => {
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const [mapLoaded, setMapLoaded] = useState(false);
+  const { language } = useLanguage();
   const mapStyles = {
     height: "100vh",
     width: "100%",
@@ -249,21 +251,25 @@ const Map: React.FC = () => {
     }
   }, []);
 
-  const markerColor = "#394c9a";  // Cambia esto por el color que desees
+  const markerColor = "#394c9a"; // Cambia esto por el color que desees
   const markerIcon = {
-    path: window.google.maps.SymbolPath.CIRCLE,  // Esto crea un círculo, puedes usar otras formas
-    scale: 8,  // Tamaño del marcador
+    path: window.google.maps.SymbolPath.CIRCLE, // Esto crea un círculo, puedes usar otras formas
+    scale: 8, // Tamaño del marcador
     fillColor: markerColor,
     fillOpacity: 0.5,
     strokeColor: markerColor,
     strokeWeight: 0.2,
   };
 
+  const mapOptions = {
+    styles: customMapStyle, // Configura el idioma del mapa
+  };
+
   return (
     <Layout>
-      <div>
+      <div className="mr-4 ml-4">
         {!mapLoaded && (
-          <div className="fixed inset-0 flex items-center justify-center bg-transparent bg-opacity-50">
+          <div className="flex items-center justify-center min-h-screen bg-transparent bg-opacity-50">
             <GridLoader color="#394c9a" loading={!mapLoaded} size={10} />
           </div>
         )}
@@ -273,11 +279,11 @@ const Map: React.FC = () => {
             zoom={15}
             center={center}
             onLoad={() => setMapLoaded(true)}
-            options={{ styles: customMapStyle }}
+            options={mapOptions}
           >
             <Marker
               position={center}
-              icon={markerIcon}  // Añade la prop icon aquí
+              icon={markerIcon} // Añade la prop icon aquí
             />
           </GoogleMap>
         )}

@@ -1,16 +1,15 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://192.168.1.161:3050",
-            "webRoot": "${workspaceFolder}"
-        }
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Server",
+        "program": "${workspaceFolder}/dist/server.js", // Asegúrate de que esto apunte al archivo JS compilado
+        "preLaunchTask": "tsc: build - tsconfig.json", // Compila TS a JS antes de lanzar
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"], // Rutas a los archivos JS compilados
+        "internalConsoleOptions": "openOnSessionStart"
+      }
     ]
-}
+  }
+  

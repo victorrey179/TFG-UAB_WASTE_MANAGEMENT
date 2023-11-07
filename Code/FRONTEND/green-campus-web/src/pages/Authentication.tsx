@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext"; // Importa useAuth
 import { Navigate, useNavigate } from "react-router-dom";
 import LayoutInitialPage from "../components/LayoutInitialPage";
 import { ReactComponent as GoogleLogo } from "../images/Google__G__Logo.svg";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Authentication: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
@@ -10,6 +11,7 @@ const Authentication: React.FC = () => {
   const navigate = useNavigate();
   const user = useAuth().user;
   const [formType, setFormType] = useState<"login" | "register">("login");
+  const { text } = useLanguage();
 
   if (user) {
     return <Navigate to="/home" replace />;
@@ -29,6 +31,7 @@ const Authentication: React.FC = () => {
 
   const handleSubmitCreate = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     const target = e.target as typeof e.target & {
       email: { value: string };
       password: { value: string };
@@ -44,9 +47,9 @@ const Authentication: React.FC = () => {
       <div className="flex flex-row">
         <div className="flex flex-col items-start justify-center w-2/6 h-full mt-40">
           <div className="flex flex-col text-left mb-5">
-            <h1 className="text-7xl font-bold text-white">Green Campus</h1>
+            <h1 className="text-7xl font-bold text-white">Blue Campus</h1>
             <h2 className="mt-2 text-4xl font-bold text-white">
-              El software para la gestión de residuos inteligentes.
+              {text("subtitle.text")}
             </h2>
           </div>
         </div>
@@ -54,21 +57,21 @@ const Authentication: React.FC = () => {
         <div className="bg-light-primary rounded-lg shadow-lg p-8 m-8 w-2/5">
             {error && <div className="error mb-4 text-red-500">{error}</div>}
             <h1 className="mb-6 text-xl font-bold">
-              {formType === "login" ? "Iniciar sesión" : "Registrarse"}
+              {formType === "login" ? text("loginPage.title") : text("registerPage.title")}
             </h1>
             {formType === "login" ? (
               <form onSubmit={handleSubmitLogin} className="my-4">
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder={text("loginPage.email")}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder={text("loginPage.password")}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
@@ -76,7 +79,7 @@ const Authentication: React.FC = () => {
                   type="submit"
                   className="w-full py-2 bg-blue-900 text-white font-bold rounded transition duration-300 ease-in-out hover:bg-black"
                 >
-                  Iniciar sesión
+                  {text("loginPage.loginButton")}
                 </button>
               </form>
             ) : (
@@ -84,68 +87,68 @@ const Authentication: React.FC = () => {
                 <input
                   type="name"
                   name="name"
-                  placeholder="Name*"
+                  placeholder={text("registerPage.name")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded "
                 />
                 <input
                   type="surname"
                   name="surname"
-                  placeholder="Surname"
+                  placeholder={text("registerPage.surname")}
                   className="mb-2 w-full p-2 border rounded "
                 />
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email*"
+                  placeholder={text("registerPage.email")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded "
                 />
                 <input
                   type="password"
                   name="password"
-                  placeholder="Password*"
+                  placeholder={text("registerPage.password")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="password*"
                   name="confirmPassword"
-                  placeholder="Confirm password*"
+                  placeholder={text("registerPage.repeatPassword")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="text"
                   name="address"
-                  placeholder="Address*"
+                  placeholder={text("registerPage.address")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="text"
                   name="city"
-                  placeholder="City*"
+                  placeholder={text("registerPage.city")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="text"
                   name="country"
-                  placeholder="Country*"
+                  placeholder={text("registerPage.country")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="number"
                   name="phone"
-                  placeholder="Phone"
+                  placeholder={text("registerPage.phone")}
                   className="mb-2 w-full p-2 border rounded"
                 />
                 <input
                   type="postalCode"
                   name="postalCode"
-                  placeholder="CP*"
+                  placeholder={text("registerPage.postalCode")+ "*"}
                   required
                   className="mb-2 w-full p-2 border rounded"
                 />
@@ -153,7 +156,7 @@ const Authentication: React.FC = () => {
                   type="submit"
                   className="w-full py-2 bg-blue-900 transition duration-300 ease-in-out hover:bg-black text-white font-bold rounded"
                 >
-                  Crear cuenta
+                  {text("registerPage.registerButton")}
                 </button>
               </form>
             )}
@@ -163,8 +166,8 @@ const Authentication: React.FC = () => {
               }
             >
               {formType === "login"
-                ? "No tengo una cuenta"
-                : "Ya tengo una cuenta"}
+                ? text("loginPage.noAcount")
+                : text("registerPage.yesAcount")}
             </button>
 
             {formType === "login" && (
@@ -173,7 +176,7 @@ const Authentication: React.FC = () => {
                 className="flex items-center justify-center mt-4 w-full py-2 bg-blue-600 text-white font-bold rounded gap-2 transition duration-300 ease-in-out hover:bg-black"
               >
                 <GoogleLogo />
-                <h1>Continuar con Google</h1>
+                <h1>{text("loginPage.loginGoogleButton")}</h1>
               </button>
             )}
           </div>

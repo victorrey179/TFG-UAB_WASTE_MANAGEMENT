@@ -1,0 +1,52 @@
+{
+  "subtitle": {
+    "text": "The software for smart waste management."
+  },
+  "initButton": {
+    "text": "Start now"
+  },
+  "languageButton": {
+    "text": "Language"
+  },
+  "language": {
+    "es": "Spanish",
+    "en": "English",
+    "ca": "Catalan"
+  },
+  "aboutUsButton": {
+    "text": "About Us"
+  },
+  "servicesButton": {
+    "text": "Services"
+  },
+  "loginPageButton": {
+    "text": "Let's get started!"
+  },
+  "loginPage": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "loginGoogleButton": "Login with Google",
+    "noAcount": "Don't have an account?"
+  },
+  "registerPage": {
+    "title": "Register",
+    "name": "Name",
+    "surname": "Surname",
+    "email": "Email",
+    "password": "Password",
+    "repeatPassword": "Repeat password",
+    "address" : "Address",
+    "city" : "City",
+    "country" : "Country",
+    "phone": "Phone number",
+    "postalCode" : "Postal code",
+    "registerButton": "Create account",
+    "yesAcount": "Already have an account?"
+  },
+  "navbar": {
+    "home": "Home",
+    "map": "Map"
+  }
+}

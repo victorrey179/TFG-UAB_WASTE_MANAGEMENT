@@ -13,7 +13,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="relative flex text-light-primary bg-black">
       <Navbar />
       <main className="overflow-y-hidden h-screen w-full bg-black">
-        <div className="ml-2 mr-2">{children}</div>
+        <div className="">{children}</div>
       </main>
     </div>
   );
