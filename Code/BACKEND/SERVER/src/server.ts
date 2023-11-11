@@ -67,62 +67,74 @@ interface DashboardDataStatistics {
   statistics: DashboardData[];
 }
 
+
+function getDurationInMilliseconds(duration: string): number {
+  const match = duration.match(/^(\d+)(min|h|d|sem|mes)$/);
+  if (!match) throw new Error("Invalid duration format");
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2];
+  switch (unit) {
+    case "min":
+      return value * 60 * 1000;
+    case "h":
+      return value * 60 * 60 * 1000;
+    case "d":
+      return value * 24 * 60 * 60 * 1000;
+    case "sem":
+      return value * 7 * 24 * 60 * 60 * 1000;
+    case "mes":
+      return value * 30 * 24 * 60 * 60 * 1000; // Approximate month duration
+    default:
+      throw new Error("Invalid duration unit");
+  }
+}
+
 app.get("/dashboardstatistics/:zoneId/:duration", async (req, res) => {
-  const zoneId = req.params.zoneId; // obtenemos el ID de la zona de los parámetros de la ruta
-  const duration = req.params.duration; // obtenemos la duración de los parámetros de la ruta
+  const { zoneId, duration } = req.params;
+
+  // Convert duration to milliseconds for calculation
+  const durationMs = getDurationInMilliseconds(duration);
 
   try {
-    // Referencia a la colección 'location' y al documento específico 'zoneId'
     const zoneDocRef = db.collection("location").doc(zoneId);
-
-    // Obtener todos los documentos de la subcolección 'containers'
     const containersSnapshot = await zoneDocRef.collection("containers").get();
 
-    // Preparar un objeto para almacenar los datos del dashboard
-    const dashboardData: DashboardData[] = [];
     const dashboardStatisticsData: DashboardDataStatistics[] = [];
 
-    // Iterar sobre cada documento en 'containers'
     for (const containerDoc of containersSnapshot.docs) {
-
-      const containerName = containerDoc.data().id; 
-
-      // Obtener la referencia a la colección 'data' del contenedor actual
+      const containerName = containerDoc.data().id;
       const dataCollectionRef = containerDoc.ref.collection("data");
-
-      // Obtener todos los documentos de la colección 'data'
       const dataSnapshot = await dataCollectionRef.get();
 
-      // Iterar sobre cada documento en 'data' y agregar los datos al objeto dashboardData
-      for (const dataDoc of dataSnapshot.docs) {
-        const data = dataDoc.data();
-        // Asegúrate de que los datos se ajusten a la estructura de DashboardData
-        const dashboardEntry: DashboardData = {
-          containerName: containerName,
-          date: data.date,
-          measurements: {
-            acceleration: data.measurements.acceleration,
-            distance: data.measurements.distance,
-            humidity: data.measurements.humidity,
-            signal: data.measurements.signal,
-            temperature: data.measurements.temperature,
-          }
-        };
-        dashboardData.push(dashboardEntry);
+      const filteredData: DashboardData[] = [];
+      let previousTimestamp = 0;
 
+      for (const dataDoc of dataSnapshot.docs) {
+        const data = dataDoc.data() as DashboardData;
+        const currentTimestamp = new Date(data.date).getTime();
+
+        if (previousTimestamp === 0 || currentTimestamp - previousTimestamp >= durationMs) {
+          filteredData.push(data);
+          previousTimestamp = currentTimestamp;
+        }
       }
-      const dashboardStatisticsEntry: DashboardDataStatistics = {
-          containerName: containerName,
-          statistics: dashboardData,
-        };
-        dashboardStatisticsData.push(dashboardStatisticsEntry);
+
+      // Asegúrate de que filteredData contenga solo los últimos 5 registros
+      const lastFiveData = filteredData.slice(-5);
+
+      if (lastFiveData.length > 0) {
+        dashboardStatisticsData.push({
+          containerName,
+          statistics: lastFiveData,
+        });
+      }
     }
 
-    // Enviar los datos recopilados como respuesta
     res.status(200).json(dashboardStatisticsData);
   } catch (error) {
-    console.error("Error al obtener datos de Firestore", error);
-    res.status(500).send("Error al obtener datos del servidor");
+    console.error("Error fetching data from Firestore", error);
+    res.status(500).send("Server error");
   }
 });
 

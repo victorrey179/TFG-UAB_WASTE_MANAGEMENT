@@ -2,6 +2,10 @@
 #include <LoRa.h>
 #include <SPI.h>
 
+//LibrerÃ­as para GPS
+#include <Adafruit_GPS.h>
+#include <SoftwareSerial.h>
+
 //Libraries para comunicar con y dibujar en la pantalla OLED integrada
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -46,10 +50,15 @@
 //Pines GPS
 #define RX 3
 #define TX 1
+SoftwareSerial serialGPS(RX, TX);
+
+
 
 
 DHT dht(DHTPIN, DHTTYPE);
 Adafruit_SSD1306 display(ANCHOPANTALLA, ALTOPANTALLA, &Wire, OLED_RST);
+Adafruit_GPS GPS(&serialGPS);
+char c;
 long duration, distance;
 int x_out, y_out, z_out; 
 int  Contador = 0;//Haremos un contador de paquetes enviados
@@ -105,7 +114,9 @@ void setup() {
   // put your setup code here, to run once
   //initialize Serial Monitor
   Serial.begin(115200);
-
+  GPS.begin(9600);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   
@@ -137,7 +148,7 @@ void setup() {
   display.drawBitmap((ANCHOPANTALLA - 62) / 2, (ALTOPANTALLA - 54) / 2, 
                      logo_bmp, 62, 54, WHITE);
   display.display();
-  delay(3000);//Esperamos tres segundos
+  delay(3000);//Esperamos cinco segundos
 }
 
 void loop() {
@@ -145,7 +156,56 @@ void loop() {
     Contador = 0;
   }
   String data;
-  // put your main code here, to run repeatedly:
+  
+  // clearGPS();
+  // while (!GPS.newNMEAreceived()) {
+  //   c = GPS.read();
+  // }
+
+  // GPS.parse(GPS.lastNMEA());
+
+  // Serial.print("Time: ");
+  // Serial.print(GPS.hour, DEC);
+  // Serial.print(':');
+  // Serial.print(GPS.minute, DEC);
+  // Serial.print(':');
+  // Serial.print(GPS.seconds, DEC);
+  // Serial.print('.');
+  // Serial.println(GPS.milliseconds);
+
+  // Serial.print("Date: ");
+  // Serial.print(GPS.day, DEC);
+  // Serial.print('/');
+  // Serial.print(GPS.month, DEC);
+  // Serial.print("/20");
+  // Serial.println(GPS.year, DEC);
+
+  // Serial.print("Fix: ");
+  // Serial.print(GPS.fix);
+  // Serial.print(" quality: ");
+  // Serial.println(GPS.fixquality);
+  // Serial.print("Satellites: ");
+  // Serial.println(GPS.satellites);
+
+  // if (GPS.fix) {
+  //   Serial.print("Location: ");
+  //   Serial.print(GPS.latitude, 4);
+  //   Serial.print(GPS.lat);
+  //   Serial.print(", ");
+  //   Serial.print(GPS.longitude, 4);
+  //   Serial.println(GPS.lon);
+  //   Serial.print("Google Maps location: ");
+  //   Serial.print(GPS.latitudeDegrees, 4);
+  //   Serial.print(", ");
+  //   Serial.println(GPS.longitudeDegrees, 4);
+
+  //   Serial.print("Speed (knots): ");
+  //   Serial.println(GPS.speed);
+  //   Serial.print("Heading: ");
+  //   Serial.println(GPS.angle);
+  //   Serial.print("Altitude: ");
+  //   Serial.println(GPS.altitude);
+  // }
     // Comienza la secuencia para medir distancia con el sensor de ultrasonidos
   digitalWrite(trigPin, LOW);   // Asegura que se comienza con el pin en bajo
   delayMicroseconds(2);         // Espera 2 microsegundos
@@ -200,7 +260,7 @@ void loop() {
   int t_int = int(round(t)); // Convierte la temperatura a entero
   int h_int = int(round(h)); // Convierte la humedad a entero
 
-  data.concat("Z1_EE_GRIS");
+  data.concat("Z2_EE_AMARILLO");
   data.concat(",");
   data.concat(t_int);
   data.concat(",");
@@ -241,4 +301,16 @@ void loop() {
   
   delay(5000);//Esperamos segundos entre cada enví­o
 
+}
+
+void clearGPS() {
+  while (!GPS.newNMEAreceived()) {
+    c = GPS.read();
+  }
+  GPS.parse(GPS.lastNMEA());
+
+  while (!GPS.newNMEAreceived()) {
+    c = GPS.read();
+  }
+  GPS.parse(GPS.lastNMEA());
 }
