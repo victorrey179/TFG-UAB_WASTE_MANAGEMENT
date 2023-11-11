@@ -26,10 +26,33 @@ interface ZoneDataItem {
   id: String | null;
 }
 
+interface Statistics {
+  date: string;
+  measurements: Measurements;
+}
+
 interface StatisticsDataItem {
   containerName: string;
-  statistics: DashboardDataItem[];
+  statistics: Statistics[];
 }
+
+const marks = [
+  { label: "1min" },
+  { label: "5min" },
+  { label: "10min" },
+  { label: "30min" },
+  { label: "1h" },
+  { label: "2h" },
+  { label: "6h" },
+  { label: "12h" },
+  { label: "1d" },
+  { label: "2d" },
+  { label: "5d" },
+  { label: "1sem" },
+  { label: "2sem" },
+  { label: "3sem" },
+  { label: "1mes" },
+];
 
 // Update the ServerContextData interface to use an array of DashboardDataItem
 interface ServerContextData {
@@ -57,7 +80,7 @@ const defaultContextValue: ServerContextData = {
   setCurrentZoneIndex: () => {},
   nextZone: () => {},
   prevZone: () => {},
-  sliderValue: 1, // Valor inicial para el slider
+  sliderValue: 0, // Valor inicial para el slider
   setSliderValue: () => {}, // Función de actualización vacía por defecto
 };
 
@@ -74,7 +97,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
   const [data, setData] = useState<DashboardDataItem[] | null>(null);
   const [zones, setZones] = useState<ZoneDataItem[] | null>(null);
   const [currentZoneIndex, setCurrentZoneIndex] = useState(0);
-  const [sliderValue, setSliderValue] = useState<number>(1);
+  const [sliderValue, setSliderValue] = useState<number>(0);
   const [statistics, setStatistics] = useState<StatisticsDataItem[] | null>(
     null
   );
@@ -119,7 +142,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
       const currentZoneId = zones[currentZoneIndex]?.id;
       if (!currentZoneId) return;
 
-      const url = `http://192.168.1.132:3050/dashboardstatistics/${currentZoneId}`;
+      const url = `http://192.168.1.132:3050/dashboardstatistics/${currentZoneId}/${marks[sliderValue].label}`;
 
       try {
         const response = await fetch(url);
@@ -139,7 +162,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
 
     fetchStatistics();
     // Añade currentZoneIndex y zones al array de dependencias para que se vuelva a ejecutar cuando cambien
-  }, [currentZoneIndex, zones]);
+  }, [currentZoneIndex, zones, sliderValue]);
 
   const nextZone = () => {
     setCurrentZoneIndex(

@@ -32,11 +32,11 @@ const MeasurementConfiguration: React.FC = () => {
           left: "50%",
           transform: "translateX(-50%)",
           fontSize: "15px",
-          fontWeight: 'bold',
+          fontWeight: "bold",
           textAlign: "center",
         }}
       >
-        {marks[sliderValue - 1].label}
+        {marks[sliderValue].label}
       </div>
       <div className="thumb" />
     </div>
@@ -44,7 +44,9 @@ const MeasurementConfiguration: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <h2 className="text-xl font-bold mb-2">Escala de representación de lecturas</h2>
+      <h2 className="text-xl font-bold mb-2">
+        Escala de representación de lecturas
+      </h2>
       <div className="flex flex-col p-3 items-center justify-center w-full">
         <style>
           {`
@@ -72,8 +74,8 @@ const MeasurementConfiguration: React.FC = () => {
         `}
         </style>
         <ReactSlider
-          min={1}
-          max={15}
+          min={0}
+          max={14}
           value={sliderValue}
           onChange={(value: number | number[]) => {
             if (typeof value === "number") {

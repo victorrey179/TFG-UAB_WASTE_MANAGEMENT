@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex h-[45%] p-2 rounded-xl w-full bg-dark-primary">
+                  <div className="flex h-[45%] rounded-xl w-full bg-dark-primary">
                     <StateContainerChart />
                   </div>
                 </div>

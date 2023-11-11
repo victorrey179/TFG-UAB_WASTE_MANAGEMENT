@@ -2,6 +2,7 @@ import React from "react";
 import { useServerContext } from "../../contexts/ServerContext"; // Asegúrate de que la ruta de importación sea correcta
 import { ActivityRings } from "@jonasdoesthings/react-activity-rings";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { v4 as uuidv4 } from 'uuid';
 
 const scale = (
   num: number,
@@ -64,6 +65,7 @@ const ContainerFilling: React.FC = () => {
           <div className="flex h-[50%]">
             {/* Asumiendo que tienes una lógica para calcular los porcentajes basados en los datos */}
             <ActivityRings
+              key={uuidv4()}
               rings={[
                 {
                   filledPercentage:
@@ -75,6 +77,7 @@ const ContainerFilling: React.FC = () => {
                 containerHeight: "17vh",
                 containerWidth: "17vh",
                 backgroundOpacity: 0.2,
+
               }}
             />
           </div>

@@ -75,6 +75,7 @@ const HTS: React.FC = () => {
           <div className="flex w-[50%]">
             {/* Asumiendo que tienes una lógica para calcular los porcentajes basados en los datos */}
             <ActivityRings
+              key={Date.now()}
               rings={[
                 {
                   filledPercentage: scale(item.measurements.signal, -135, 0, 0, 100) / 100,
