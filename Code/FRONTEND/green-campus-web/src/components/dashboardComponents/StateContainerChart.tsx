@@ -119,15 +119,15 @@ const StateContainerChart: React.FC = () => {
   // y que quieres graficar estas mediciones en el tiempo.
 
   // Crear datasets dinámicamente a partir de los datos de estadísticas
+  console.log(statistics);
   const datasets =
     statistics.map((statItem) => {
-      const data = statItem.statistics.map((stat) => {
-        console.log(stat.measurements); // Temporal, para depuración
-        return stat.measurements?.temperature ?? null;
+      const datas = statItem.records.map((stat) => {
+        return stat.measurements.temperature ?? null;
       }); // Filtra los valores nulos
-
+      console.log(datas);
       const colorName =
-        statItem.containerName.split("_").pop()?.toUpperCase() || "DEFAULT";
+        statItem.containerId.split("_").pop()?.toUpperCase() || "DEFAULT";
       const colors = containerColorMap[colorName] || {
         backgroundColor: "rgba(75,192,192,0.4)",
         borderColor: "rgba(75,192,192,1)",
@@ -135,7 +135,7 @@ const StateContainerChart: React.FC = () => {
 
       return {
         label: "",
-        data: data,
+        data: datas,
         fill: false,
         backgroundColor: colors.backgroundColor,
         borderColor: colors.borderColor,

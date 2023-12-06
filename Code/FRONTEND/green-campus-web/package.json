@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.8.8",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@jonasdoesthings/react-activity-rings": "^1.1.2",
@@ -12,6 +13,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/i18next": "^13.0.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.59",
     "@types/react": "^18.2.29",
@@ -21,7 +23,7 @@
     "date-fns": "^2.30.0",
     "firebase": "^10.5.0",
     "framer-motion": "^10.16.4",
-    "i18next": "^23.6.0",
+    "i18next": "^23.7.7",
     "moment": "^2.29.4",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
@@ -29,8 +31,8 @@
     "react-d3-speedometer": "^1.1.0",
     "react-datepicker": "^4.21.0",
     "react-dom": "^18.2.0",
-    "react-i18next": "^13.3.1",
-    "react-router-dom": "^6.17.0",
+    "react-i18next": "^13.5.0",
+    "react-router-dom": "^6.20.1",
     "react-scripts": "5.0.1",
     "react-slider": "^2.0.6",
     "react-spinners": "^0.13.8",
@@ -67,6 +69,8 @@
   },
   "devDependencies": {
     "@types/react-datepicker": "^4.19.1",
+    "@types/react-i18next": "^8.1.0",
+    "@types/react-router-dom": "^5.3.3",
     "@types/react-slider": "^1.3.3"
   }
 }

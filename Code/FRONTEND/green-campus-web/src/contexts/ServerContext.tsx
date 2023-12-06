@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import React, {
   createContext,
   useState,
@@ -5,6 +6,9 @@ import React, {
   useContext,
   ReactNode,
 } from "react";
+
+import { useQuery } from "@apollo/client";
+import { ZONES_QUERY, STATISTICS_QUERY, DASHBOARD_HTS_QUERY } from "./Queries";
 
 // Define the expected shape of measurements
 interface Measurements {
@@ -17,23 +21,21 @@ interface Measurements {
 
 // Define the expected shape of the dashboard data item
 interface DashboardDataItem {
-  containerName: string;
+  containerId: string;
   date: string;
   measurements: Measurements;
 }
 
-interface ZoneDataItem {
-  id: String | null;
-}
 
 interface Statistics {
   date: string;
+  id: string;
   measurements: Measurements;
 }
 
 interface StatisticsDataItem {
-  containerName: string;
-  statistics: Statistics[];
+  containerId: string;
+  records: Statistics[];
 }
 
 const marks = [
@@ -57,11 +59,11 @@ const marks = [
 // Update the ServerContextData interface to use an array of DashboardDataItem
 interface ServerContextData {
   data: DashboardDataItem[] | null;
-  zones: ZoneDataItem[] | null;
+  zones: String[] | null;
   currentZoneIndex: number;
   statistics: StatisticsDataItem[] | null;
   setData: React.Dispatch<React.SetStateAction<DashboardDataItem[] | null>>;
-  setZones: React.Dispatch<React.SetStateAction<ZoneDataItem[] | null>>;
+  setZones: React.Dispatch<React.SetStateAction<String[]>>;
   setCurrentZoneIndex: React.Dispatch<React.SetStateAction<number>>;
   nextZone: () => void;
   prevZone: () => void;
@@ -72,7 +74,7 @@ interface ServerContextData {
 // Provide a default context value that matches the interface
 const defaultContextValue: ServerContextData = {
   data: null,
-  zones: null,
+  zones: [],
   currentZoneIndex: 0,
   statistics: null,
   setData: () => {},
@@ -95,74 +97,48 @@ interface ServerProviderProps {
 // Define a provider component with proper typing for its props
 export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
   const [data, setData] = useState<DashboardDataItem[] | null>(null);
-  const [zones, setZones] = useState<ZoneDataItem[] | null>(null);
+  const [zones, setZones] = useState<String[]>([]);
   const [currentZoneIndex, setCurrentZoneIndex] = useState(0);
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [statistics, setStatistics] = useState<StatisticsDataItem[] | null>(
     null
   );
+  const {
+    data: dashboardData,
+    error: dashboardError,
+    loading: dashboardLoading,
+  } = useQuery(DASHBOARD_HTS_QUERY, {
+    variables: {
+      zoneId: zones.length > 0 ? zones[currentZoneIndex] : null,
+    },
+    skip: zones.length === 0, // Evita ejecutar la consulta si no hay zonas
+  });
 
   // Connect to the server and handle updates
   useEffect(() => {
-    const fetchData = async () => {
-      // Asegúrate de que las zonas se hayan cargado antes de intentar acceder a ellas
-      if (!zones || zones.length === 0) return;
+    if (dashboardData) {
+      setData(dashboardData.dashboardHTS);
+    }
+  }, [data, dashboardData, currentZoneIndex, zones]);
 
-      // Construye la URL con el ID de la zona actual
-      const currentZoneId = zones[currentZoneIndex]?.id;
-      if (!currentZoneId) return; // Maneja el caso donde currentZoneId pueda ser nulo o indefinido
-
-      const url = `http://192.168.1.132:3050/dashboardhts/${currentZoneId}`;
-
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const data: DashboardDataItem[] = await response.json();
-          setData(data);
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      } catch (error) {
-        console.error(
-          "There has been a problem with your fetch operation:",
-          error
-        );
-      }
-    };
-
-    fetchData();
-    // Añade currentZoneIndex y zones al array de dependencias para que se vuelva a ejecutar cuando cambien
-  }, [currentZoneIndex, zones]);
+  const {
+    data: statisticsData,
+    error: statisticsError,
+    loading: statisticsLoading,
+  } = useQuery(STATISTICS_QUERY, {
+    variables: {
+      zoneId: zones.length > 0 ? zones[currentZoneIndex] : null,
+      duration: marks[sliderValue].label,
+    },
+    skip: zones.length === 0, // Evita ejecutar la consulta si no hay zonas
+  });
 
   useEffect(() => {
-    const fetchStatistics = async () => {
-      // Repite la lógica para asegurarte de que las zonas estén cargadas y para construir la URL
-      if (!zones || zones.length === 0) return;
-
-      const currentZoneId = zones[currentZoneIndex]?.id;
-      if (!currentZoneId) return;
-
-      const url = `http://192.168.1.132:3050/dashboardstatistics/${currentZoneId}/${marks[sliderValue].label}`;
-
-      try {
-        const response = await fetch(url);
-        if (response.ok) {
-          const statistics: StatisticsDataItem[] = await response.json();
-          setStatistics(statistics);
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      } catch (error) {
-        console.error(
-          "There has been a problem with your fetch operation:",
-          error
-        );
-      }
-    };
-
-    fetchStatistics();
+    if (statisticsData) {
+      setStatistics(statisticsData.dashboardStatistics);
+    }
     // Añade currentZoneIndex y zones al array de dependencias para que se vuelva a ejecutar cuando cambien
-  }, [currentZoneIndex, zones, sliderValue]);
+  }, [statisticsData, currentZoneIndex, zones, sliderValue]);
 
   const nextZone = () => {
     setCurrentZoneIndex(
@@ -178,28 +154,13 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
     );
   };
 
+  const { data: zonesData } = useQuery(ZONES_QUERY);
   useEffect(() => {
-    const fetchZones = async () => {
-      try {
-        const response = await fetch("http://192.168.1.132:3050/zones");
-        if (response.ok) {
-          const zones: ZoneDataItem[] = await response.json();
-          setZones(zones);
-        } else {
-          throw new Error("Network response was not ok.");
-        }
-      } catch (error) {
-        console.error(
-          "There has been a problem with your fetch operation:",
-          error
-        );
-      }
-    };
-
-    fetchZones();
-
-    // Set up a polling mechanism here if you need real-time updates
-  }, []);
+    if (zonesData) {
+      setZones(zonesData.zoneIds);
+    }
+    
+  }, [zonesData, zones]);
 
   // Pass the state and updater function through the context
   return (

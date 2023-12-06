@@ -16,7 +16,8 @@ const Zone: React.FC = () => {
       </button>
       <div className="flex-grow text-center">
         {/* Asegúrate de que currentZoneIndex no está fuera de rango */}
-        <h2 className="text-xl font-bold">{zones[currentZoneIndex]?.id}</h2>
+        <h2 className="text-xl font-bold">{zones[currentZoneIndex]}</h2>
+        
       </div>
       <button onClick={nextZone} aria-label="Next zone" className="flex-initial">
         <ArrowForwardIosIcon />

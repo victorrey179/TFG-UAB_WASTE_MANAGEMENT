@@ -77,29 +77,27 @@ const resolvers = {
       const { zoneId, duration } = args;
       const durationMs = getDurationInMilliseconds(duration);
       const selectedZone = bluecampusdb.find((zone) => zone.idZone === zoneId);
-
+    
       if (!selectedZone) {
         throw new Error("Zone not found");
       }
-
+    
       const dashboardDataList = [];
-
+    
       for (const container of selectedZone.containers) {
-        let lastSelectedRecordTime = 0;
         const records = [];
-
-        for (const record of container.data) {
+        let lastSelectedRecordTime = 0;
+    
+        for (const record of container.data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())) {
           const recordTime = new Date(record.date).getTime();
-
-          if (
-            lastSelectedRecordTime === 0 ||
-            recordTime - lastSelectedRecordTime >= durationMs
-          ) {
+    
+          // Verifica si el registro actual cumple con el intervalo de tiempo y limita a 5 registros
+          if ((lastSelectedRecordTime === 0 || (lastSelectedRecordTime - recordTime) >= durationMs) && records.length < 5) {
             records.push(record);
             lastSelectedRecordTime = recordTime;
           }
         }
-
+    
         if (records.length > 0) {
           dashboardDataList.push({
             containerId: container.idContainer,
@@ -107,9 +105,10 @@ const resolvers = {
           });
         }
       }
-
+    
       return dashboardDataList;
     },
+    
     dashboardHTS: async (root: any, args: DashboardArgs) => {
       const { zoneId } = args;
       try {

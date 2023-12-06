@@ -14,6 +14,13 @@
 //Libraries para sensor Humedad y temperatura
 #include "DHT.h"
 
+//Libraries para Giroscopio
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+
+//Libraries para Sensor LiDAR
+#include "Adafruit_VL53L0X.h"
+
 //Pines que se utilizarán por el módulo DHT(temperatura y humedad)
 #define DHTPIN 25
 
@@ -38,10 +45,6 @@
 #define OLED_SCL 15 
 #define OLED_RST 16
 
-//Pines necesarios para el sensor de ultrasonidos
-#define echoPin 13
-#define trigPin 12
-
 //Pines necesarios para el sensor de aceleración
 #define x_axis 38
 #define y_axis 39
@@ -50,14 +53,14 @@
 //Pines GPS
 #define RX 3
 #define TX 1
+
 SoftwareSerial serialGPS(RX, TX);
-
-
-
-
 DHT dht(DHTPIN, DHTTYPE);
 Adafruit_SSD1306 display(ANCHOPANTALLA, ALTOPANTALLA, &Wire, OLED_RST);
 Adafruit_GPS GPS(&serialGPS);
+Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+Adafruit_MPU6050 mpu;
+
 char c;
 long duration, distance;
 int x_out, y_out, z_out; 
@@ -116,9 +119,6 @@ void setup() {
   Serial.begin(115200);
   GPS.begin(9600);
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
   
   pinMode(OLED_RST, OUTPUT);//reseteamos la pantalla OLED para comenzar
   digitalWrite(OLED_RST, LOW);
@@ -130,6 +130,27 @@ void setup() {
     Serial.println(F("Fallo iniciando SSD1306"));
     for(;;); // Si detecta el fallo anterior, detiene el cÃ³digo aquÃ­ hasta que se reinicie
   }
+
+  // Iniciar sensor LiDAR
+  Serial.println("VL53L0X test");
+  if (!lox.begin()) {
+    Serial.println(F("Error al iniciar VL53L0X"));
+    while(1);
+  }
+
+   // Iniciar sensor MPU-6050
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  // Configura el rango deseado del MPU-6050
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   SPI.begin(SCK, MISO, MOSI, SS);  //Definimos pines SPI
   LoRa.setPins(SS, RST, DIO0); //Configuramos el LoRa para enviar
@@ -157,84 +178,105 @@ void loop() {
   }
   String data;
   
-  // clearGPS();
-  // while (!GPS.newNMEAreceived()) {
-  //   c = GPS.read();
-  // }
+  clearGPS();
+  while (!GPS.newNMEAreceived()) {
+    c = GPS.read();
+  }
 
-  // GPS.parse(GPS.lastNMEA());
+  GPS.parse(GPS.lastNMEA());
 
-  // Serial.print("Time: ");
-  // Serial.print(GPS.hour, DEC);
-  // Serial.print(':');
-  // Serial.print(GPS.minute, DEC);
-  // Serial.print(':');
-  // Serial.print(GPS.seconds, DEC);
-  // Serial.print('.');
-  // Serial.println(GPS.milliseconds);
+  Serial.print("Time: ");
+  Serial.print(GPS.hour, DEC);
+  Serial.print(':');
+  Serial.print(GPS.minute, DEC);
+  Serial.print(':');
+  Serial.print(GPS.seconds, DEC);
+  Serial.print('.');
+  Serial.println(GPS.milliseconds);
 
-  // Serial.print("Date: ");
-  // Serial.print(GPS.day, DEC);
-  // Serial.print('/');
-  // Serial.print(GPS.month, DEC);
-  // Serial.print("/20");
-  // Serial.println(GPS.year, DEC);
+  Serial.print("Date: ");
+  Serial.print(GPS.day, DEC);
+  Serial.print('/');
+  Serial.print(GPS.month, DEC);
+  Serial.print("/20");
+  Serial.println(GPS.year, DEC);
 
-  // Serial.print("Fix: ");
-  // Serial.print(GPS.fix);
-  // Serial.print(" quality: ");
-  // Serial.println(GPS.fixquality);
-  // Serial.print("Satellites: ");
-  // Serial.println(GPS.satellites);
+  Serial.print("Fix: ");
+  Serial.print(GPS.fix);
+  Serial.print(" quality: ");
+  Serial.println(GPS.fixquality);
+  Serial.print("Satellites: ");
+  Serial.println(GPS.satellites);
 
-  // if (GPS.fix) {
-  //   Serial.print("Location: ");
-  //   Serial.print(GPS.latitude, 4);
-  //   Serial.print(GPS.lat);
-  //   Serial.print(", ");
-  //   Serial.print(GPS.longitude, 4);
-  //   Serial.println(GPS.lon);
-  //   Serial.print("Google Maps location: ");
-  //   Serial.print(GPS.latitudeDegrees, 4);
-  //   Serial.print(", ");
-  //   Serial.println(GPS.longitudeDegrees, 4);
+  if (GPS.fix) {
+    Serial.print("Location: ");
+    Serial.print(GPS.latitude, 4);
+    Serial.print(GPS.lat);
+    Serial.print(", ");
+    Serial.print(GPS.longitude, 4);
+    Serial.println(GPS.lon);
+    Serial.print("Google Maps location: ");
+    Serial.print(GPS.latitudeDegrees, 4);
+    Serial.print(", ");
+    Serial.println(GPS.longitudeDegrees, 4);
 
-  //   Serial.print("Speed (knots): ");
-  //   Serial.println(GPS.speed);
-  //   Serial.print("Heading: ");
-  //   Serial.println(GPS.angle);
-  //   Serial.print("Altitude: ");
-  //   Serial.println(GPS.altitude);
-  // }
-    // Comienza la secuencia para medir distancia con el sensor de ultrasonidos
-  digitalWrite(trigPin, LOW);   // Asegura que se comienza con el pin en bajo
-  delayMicroseconds(2);         // Espera 2 microsegundos
-  digitalWrite(trigPin, HIGH);  // Envía un pulso alto
-  delayMicroseconds(10);        // Espera 10 microsegundos
-  digitalWrite(trigPin, LOW);   // Vuelve a poner el pin en bajo
+    Serial.print("Speed (knots): ");
+    Serial.println(GPS.speed);
+    Serial.print("Heading: ");
+    Serial.println(GPS.angle);
+    Serial.print("Altitude: ");
+    Serial.println(GPS.altitude);
+  }
 
-  // Lee la duración del pulso de retorno
-  duration = pulseIn(echoPin, HIGH);
-  distance = duration / 58.2;
+  VL53L0X_RangingMeasurementData_t measure;
+    
+  Serial.print("Leyendo sensor... ");
+  lox.rangingTest(&measure, false); // si se pasa true como parametro, muestra por puerto serie datos de debug
+
+  if (measure.RangeStatus != 4)
+  {
+    Serial.print("Distancia (mm): ");
+  Serial.println(measure.RangeMilliMeter);
+  distance = measure.RangeMilliMeter/10;
+  } 
+  else
+  {
+    Serial.println("  Fuera de rango ");
+  }
 
   Serial.print("Distancia: ");
   Serial.print(String(distance));
   Serial.print(" cm");
   Serial.println();
 
-  x_out = analogRead(x_axis);
-  y_out = analogRead(y_axis);
-  z_out = analogRead(z_axis);
+  /* Lee los datos del sensor */
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  // Calcula los ángulos aproximados
+  // Nota: Esto es solo una aproximación y puede tener errores
+  float gyroX = g.gyro.x;
+  float gyroY = g.gyro.y;
+  float gyroZ = g.gyro.z;
+
+  // Muestra los datos del giroscopio en la consola
+  Serial.print("Giroscopio X: "); Serial.print(gyroX);
+  Serial.print(" Y: "); Serial.print(gyroY);
+  Serial.print(" Z: "); Serial.println(gyroZ);
+
+  // x_out = analogRead(x_axis);
+  // y_out = analogRead(y_axis);
+  // z_out = analogRead(z_axis);
 
   Serial.println();
   Serial.print("x = ");
-  Serial.print(x_out);
+  Serial.print(gyroX);
   Serial.print("\t\t");
   Serial.print("y = ");
-  Serial.print(y_out);
+  Serial.print(gyroY);
   Serial.print("\t\t");
   Serial.print("z = ");
-  Serial.print(z_out);
+  Serial.print(gyroZ);
   Serial.println();
 
 

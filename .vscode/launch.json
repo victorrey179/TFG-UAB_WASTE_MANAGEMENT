@@ -1,32 +1,14 @@
 {
-    "version": "1.0.0",
-    "configurations": [
-
-
-        {
-            "name": "Start App",
-            "runtimeVersion": "16.0.0",
-            "runtimeArgs": ["start"],
-            "env": {
-                "BROWSER": "none"
-            },
-            "request": "launch",
-            "runtimeExecutable": "npm",
-            "type": "node",
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Run Chrome",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceFolder}"
-        }
-    ],
-    "compounds": [
-        {
-          "name": "Debug App",
-          "configurations": ["Start App", "Run Chrome"],
-          "stopAll": true
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/Code/BACKEND/SERVER/apolloServer/dist/index.js",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": ["${workspaceFolder}/apolloServer/dist/**/*.js"],
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
 }

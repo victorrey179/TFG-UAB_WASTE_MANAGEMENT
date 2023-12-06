@@ -60,13 +60,13 @@ const HTS: React.FC = () => {
             {/* Puedes decidir qué color mostrar basado en el nombre del contenedor o cualquier otro criterio */}
             <div
               className={`w-2 h-10 rounded ${
-                item.containerName.includes("AMARILLO")
+                item.containerId.includes("amarillo")
                   ? "bg-yellow-500"
-                  : item.containerName.includes("AZUL")
+                  : item.containerId.includes("azul")
                   ? "bg-blue-500"
-                  : item.containerName.includes("VERDE")
+                  : item.containerId.includes("verde")
                   ? "bg-green-900"
-                  : item.containerName.includes("MARRON")
+                  : item.containerId.includes("marron")
                   ? "bg-brown"
                   : "bg-gray-500"
               }`}
