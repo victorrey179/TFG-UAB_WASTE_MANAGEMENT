@@ -1,9 +1,9 @@
 #include "Network.h"
 
-// #define WIFI_SSID "MOVISTAR_D793"
-// #define WIFI_PASSWORD "GRqpMtGWxJhoHLQmKqrx"
-#define WIFI_SSID "MIWIFI_dE33"
-#define WIFI_PASSWORD "MPvNYANX"
+#define WIFI_SSID "MOVISTAR_D793"
+#define WIFI_PASSWORD "GRqpMtGWxJhoHLQmKqrx"
+// #define WIFI_SSID "MIWIFI_dE33"
+// #define WIFI_PASSWORD "MPvNYANX"
 
 static Network *instance = NULL;
 
@@ -36,7 +36,7 @@ void Network::initWiFi() {
 void Network::httpSendRequest(String location, int rssi, int t, int h, int distance, int x, int y, int z) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    http.begin("http://34.175.50.106:3050/data"); // Replace with your local server endpoint
+    http.begin("http://192.168.1.187:4000/data"); // Replace with your local server endpoint
     http.addHeader("Content-Type", "application/json");
     
     String httpRequestData = "{\"location\":\"" + location + 

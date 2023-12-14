@@ -117,8 +117,8 @@ void setup() {
   // put your setup code here, to run once
   //initialize Serial Monitor
   Serial.begin(115200);
-  GPS.begin(9600);
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  // GPS.begin(9600);
+  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   
   pinMode(OLED_RST, OUTPUT);//reseteamos la pantalla OLED para comenzar
   digitalWrite(OLED_RST, LOW);
@@ -176,57 +176,79 @@ void loop() {
   if (Contador == 10000){
     Contador = 0;
   }
+  String color_container = "AZUL";
+  int modulec = Contador%5;
+  switch(modulec) {
+    case 0:
+      color_container = "AZUL";
+    break;
+    case 1:
+      color_container = "AMARILLO";
+    break;
+    case 2:
+      color_container = "VERDE";
+    break;
+    case 3:
+      color_container = "MARRON";
+    break;
+    case 4:
+      color_container = "GRIS";
+    break;
+    default: 
+      color_container = "GRIS";
+    break;
+  }
   String data;
   
-  clearGPS();
-  while (!GPS.newNMEAreceived()) {
-    c = GPS.read();
-  }
+  // clearGPS();
+  // while (!GPS.newNMEAreceived()) {
+  //   c = GPS.read();
+  // }
 
-  GPS.parse(GPS.lastNMEA());
+  // GPS.parse(GPS.lastNMEA());
 
-  Serial.print("Time: ");
-  Serial.print(GPS.hour, DEC);
-  Serial.print(':');
-  Serial.print(GPS.minute, DEC);
-  Serial.print(':');
-  Serial.print(GPS.seconds, DEC);
-  Serial.print('.');
-  Serial.println(GPS.milliseconds);
+  // Serial.print("Time: ");
+  // Serial.print(GPS.hour, DEC);
+  // Serial.print(':');
+  // Serial.print(GPS.minute, DEC);
+  // Serial.print(':');
+  // Serial.print(GPS.seconds, DEC);
+  // Serial.print('.');
+  // Serial.println(GPS.milliseconds);
 
-  Serial.print("Date: ");
-  Serial.print(GPS.day, DEC);
-  Serial.print('/');
-  Serial.print(GPS.month, DEC);
-  Serial.print("/20");
-  Serial.println(GPS.year, DEC);
+  // Serial.print("Date: ");
+  // Serial.print(GPS.day, DEC);
+  // Serial.print('/');
+  // Serial.print(GPS.month, DEC);
+  // Serial.print("/20");
+  // Serial.println(GPS.year, DEC);
 
-  Serial.print("Fix: ");
-  Serial.print(GPS.fix);
-  Serial.print(" quality: ");
-  Serial.println(GPS.fixquality);
-  Serial.print("Satellites: ");
-  Serial.println(GPS.satellites);
+  // Serial.print("Fix: ");
+  // Serial.print(GPS.fix);
+  // Serial.print(" quality: ");
+  // Serial.println(GPS.fixquality);
+  // Serial.print("Satellites: ");
+  // Serial.println(GPS.satellites);
 
-  if (GPS.fix) {
-    Serial.print("Location: ");
-    Serial.print(GPS.latitude, 4);
-    Serial.print(GPS.lat);
-    Serial.print(", ");
-    Serial.print(GPS.longitude, 4);
-    Serial.println(GPS.lon);
-    Serial.print("Google Maps location: ");
-    Serial.print(GPS.latitudeDegrees, 4);
-    Serial.print(", ");
-    Serial.println(GPS.longitudeDegrees, 4);
+  // if (GPS.fix) {
+  //   Serial.print("Location: ");
+  //   Serial.print(GPS.latitude, 4);
+  //   Serial.print(GPS.lat);
+  //   Serial.print(", ");
+  //   Serial.print(GPS.longitude, 4);
+  //   Serial.println(GPS.lon);
+  //   Serial.print("Google Maps location: ");
+  //   Serial.print(GPS.latitudeDegrees, 4);
+  //   Serial.print(", ");
+  //   Serial.println(GPS.longitudeDegrees, 4);
 
-    Serial.print("Speed (knots): ");
-    Serial.println(GPS.speed);
-    Serial.print("Heading: ");
-    Serial.println(GPS.angle);
-    Serial.print("Altitude: ");
-    Serial.println(GPS.altitude);
-  }
+  //   Serial.print("Speed (knots): ");
+  //   Serial.println(GPS.speed);
+  //   Serial.print("Heading: ");
+  //   Serial.println(GPS.angle);
+  //   Serial.print("Altitude: ");
+  //   Serial.println(GPS.altitude);
+  // }
 
   VL53L0X_RangingMeasurementData_t measure;
     
@@ -302,7 +324,8 @@ void loop() {
   int t_int = int(round(t)); // Convierte la temperatura a entero
   int h_int = int(round(h)); // Convierte la humedad a entero
 
-  data.concat("Z2_EE_AMARILLO");
+  data.concat("Z5_");
+  data.concat(color_container);
   data.concat(",");
   data.concat(t_int);
   data.concat(",");
@@ -329,7 +352,7 @@ void loop() {
                      logo_bmp2, 23, 20, WHITE);
   display.setCursor(30,7);
   display.setTextSize(1);//TamaÃ±o de fuente a 1 punto
-  display.print("Blue Campus");
+  display.print("Blue Campus "+color_container);
   display.setCursor(0,30);
   display.print("Transmitiendo (10s)");//Mensaje de confirmaciÃ³n
   display.drawBitmap(98, 44, 
@@ -341,7 +364,7 @@ void loop() {
 
   Contador++;
   
-  delay(5000);//Esperamos segundos entre cada enví­o
+  delay(10000);//Esperamos segundos entre cada enví­o
 
 }
 

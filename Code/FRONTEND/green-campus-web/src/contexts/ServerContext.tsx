@@ -7,8 +7,9 @@ import React, {
   ReactNode,
 } from "react";
 
-import { useQuery } from "@apollo/client";
+import { useQuery, useSubscription } from "@apollo/client";
 import { ZONES_QUERY, STATISTICS_QUERY, DASHBOARD_HTS_QUERY } from "./Queries";
+import { CREATED_DATA, UPDATED_DATA } from "./Subscriptions";
 
 // Define the expected shape of measurements
 interface Measurements {
@@ -25,7 +26,6 @@ interface DashboardDataItem {
   date: string;
   measurements: Measurements;
 }
-
 
 interface Statistics {
   date: string;
@@ -159,7 +159,6 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
     if (zonesData) {
       setZones(zonesData.zoneIds);
     }
-    
   }, [zonesData, zones]);
 
   // Pass the state and updater function through the context

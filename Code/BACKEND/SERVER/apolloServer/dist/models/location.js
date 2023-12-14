@@ -49,7 +49,7 @@ const ZoneSchema = new mongoose_1.Schema({
     _id: { type: String, required: true },
     idZone: { type: String, required: true },
     containers: { type: [ContainerSchema], required: true }
-});
+}, { collection: 'locations' });
 // Creación de los modelos
 const MeasurementModel = mongoose_1.default.model('Measurement', MeasurementSchema);
 exports.MeasurementModel = MeasurementModel;

@@ -5,6 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Zone: React.FC = () => {
   const { zones, currentZoneIndex, nextZone, prevZone } = useServerContext();
+  console.log(zones);
 
   if (!zones || zones.length === 0) {
     return <div className="loading-container rounded-xl"></div>;
