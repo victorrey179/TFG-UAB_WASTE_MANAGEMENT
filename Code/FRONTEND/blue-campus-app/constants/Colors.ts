@@ -4,10 +4,13 @@ const tintColorDark = '#fff';
 export default {
   light: {
     text: '#000',
-    background: '#fff',
+    background: 'rgba(255, 255, 255, 0.9)',
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
+    backgroundCamera: 'rgba(255, 255, 255, 0.5)',
+    home:'rgba(255, 255, 255, 0.1)',
+    card: 'rgba(100, 100, 100, 0.1)'
   },
   dark: {
     text: '#fff',
@@ -15,5 +18,8 @@ export default {
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
+    backgroundCamera: 'rgba(0, 0, 0, 0.5)',
+    home: 'rgba(0, 0, 0, 1)',
+    card: 'rgba(40, 40, 40, 0.8)'
   },
 };

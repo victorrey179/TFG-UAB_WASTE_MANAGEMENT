@@ -334,8 +334,8 @@ const httpServer = createServer(app);
   const wsServer = new WebSocketServer({ server: httpServer, path: '/graphql' });
 
   // Iniciar el servidor HTTP
-  httpServer.listen(4000, '192.168.1.187', () => {
-    console.log(`🚀 Server is running on http://192.168.1.187:4000/graphql`);
-    console.log(`🚀 WebSocket is running on ws://192.168.1.187:4000/graphql`)
+  httpServer.listen(4000, '192.168.1.132', () => {
+    console.log(`🚀 Server is running on http://192.168.1.132:4000/graphql`);
+    console.log(`🚀 WebSocket is running on ws://192.168.1.132:4000/graphql`)
   });
 })();

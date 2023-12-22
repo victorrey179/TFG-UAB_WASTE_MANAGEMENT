@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 import Layout from "../components/Layout";
 import { GridLoader } from "react-spinners";
-import { useLanguage } from "../contexts/LanguageContext";
 
 const Map: React.FC = () => {
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const [mapLoaded, setMapLoaded] = useState(false);
-  const { language } = useLanguage();
   const mapStyles = {
     height: "100vh",
     width: "100%",

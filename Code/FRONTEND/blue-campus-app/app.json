@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "green-campus-app",
-    "slug": "green-campus-app",
+    "name": "blue-campus-app",
+    "slug": "blue-campus-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
