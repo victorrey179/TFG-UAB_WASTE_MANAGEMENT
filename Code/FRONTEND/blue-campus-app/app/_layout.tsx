@@ -5,10 +5,13 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Slot } from "expo-router";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
-import { StateProvider } from "./contexts/stateContext";
+import { ApolloProvider } from "@apollo/client";
+import client from "./apollo-client";
+import { AuthProvider } from "../contexts/AuthContext";
+import AuthScreen from "./screens/AuthScreen";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,14 +54,14 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <StateProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-          <Stack.Screen name="menu" options={{ presentation: "card" }} />
-        </Stack>
-      </ThemeProvider>
-    </StateProvider>
+    <ApolloProvider client={client}>
+      <AuthProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Slot />
+        </ThemeProvider>
+      </AuthProvider>
+    </ApolloProvider>
   );
 }

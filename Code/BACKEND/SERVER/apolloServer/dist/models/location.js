@@ -31,31 +31,32 @@ const MeasurementSchema = new mongoose_1.Schema({
     distance: { type: Number, required: true },
     temperature: { type: Number, required: true },
     humidity: { type: Number, required: true },
-    signal: { type: Number, required: true }
+    signal: { type: Number, required: true },
 });
 // Definición del esquema de Record
 const RecordSchema = new mongoose_1.Schema({
     id: { type: String, required: true },
     date: { type: String, required: true },
-    measurements: { type: MeasurementSchema, required: true }
+    measurements: { type: MeasurementSchema, required: true },
 });
 // Definición del esquema de Container
 const ContainerSchema = new mongoose_1.Schema({
     idContainer: { type: String, required: true },
-    data: [RecordSchema] // Un array de registros
+    data: [RecordSchema], // Un array de registros
 });
 // Definición del esquema de Zone
 const ZoneSchema = new mongoose_1.Schema({
     _id: { type: String, required: true },
     idZone: { type: String, required: true },
-    containers: { type: [ContainerSchema], required: true }
-}, { collection: 'locations' });
+    containers: { type: [ContainerSchema], required: true },
+    coordinates: { type: [Number], required: true },
+}, { collection: "locations" });
 // Creación de los modelos
-const MeasurementModel = mongoose_1.default.model('Measurement', MeasurementSchema);
+const MeasurementModel = mongoose_1.default.model("Measurement", MeasurementSchema);
 exports.MeasurementModel = MeasurementModel;
-const RecordModel = mongoose_1.default.model('Record', RecordSchema);
+const RecordModel = mongoose_1.default.model("Record", RecordSchema);
 exports.RecordModel = RecordModel;
-const ContainerModel = mongoose_1.default.model('Container', ContainerSchema);
+const ContainerModel = mongoose_1.default.model("Container", ContainerSchema);
 exports.ContainerModel = ContainerModel;
-const ZoneModel = mongoose_1.default.model('Zone', ZoneSchema);
+const ZoneModel = mongoose_1.default.model("Zone", ZoneSchema);
 exports.ZoneModel = ZoneModel;

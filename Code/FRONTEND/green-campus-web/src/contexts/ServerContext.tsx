@@ -8,7 +8,12 @@ import React, {
 } from "react";
 
 import { useQuery, useSubscription } from "@apollo/client";
-import { ZONES_QUERY, STATISTICS_QUERY, DASHBOARD_HTS_QUERY } from "./Queries";
+import {
+  ZONES_QUERY,
+  STATISTICS_QUERY,
+  DASHBOARD_HTS_QUERY,
+  POINTS_TO_BE_COLLECTED,
+} from "./Queries";
 import { CREATED_DATA, UPDATED_DATA } from "./Subscriptions";
 
 // Define the expected shape of measurements
@@ -32,12 +37,25 @@ interface Statistics {
   id: string;
   measurements: Measurements;
 }
+interface Records {
+  idContainer: string;
+}
+
+interface RecordsDataItem {
+  containerId: string;
+  records: Records[];
+}
 
 interface StatisticsDataItem {
   containerId: string;
   records: Statistics[];
 }
 
+interface PointsToBeCollected {
+  zoneId: string;
+  coordinates: number[];
+  containers: RecordsDataItem[];
+}
 const marks = [
   { label: "1min" },
   { label: "5min" },
@@ -55,7 +73,6 @@ const marks = [
   { label: "3sem" },
   { label: "1mes" },
 ];
-
 // Update the ServerContextData interface to use an array of DashboardDataItem
 interface ServerContextData {
   data: DashboardDataItem[] | null;
@@ -69,6 +86,7 @@ interface ServerContextData {
   prevZone: () => void;
   sliderValue: number;
   setSliderValue: React.Dispatch<React.SetStateAction<number>>;
+  pointsToBeCollected: PointsToBeCollected[];
 }
 
 // Provide a default context value that matches the interface
@@ -84,6 +102,7 @@ const defaultContextValue: ServerContextData = {
   prevZone: () => {},
   sliderValue: 0, // Valor inicial para el slider
   setSliderValue: () => {}, // Función de actualización vacía por defecto
+  pointsToBeCollected: [],
 };
 
 // Create a context with the default value
@@ -103,6 +122,10 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
   const [statistics, setStatistics] = useState<StatisticsDataItem[] | null>(
     null
   );
+  const [pointsToBeCollected, setPointsToBeCollected] = useState<
+    PointsToBeCollected[]
+  >([]);
+
   const {
     data: dashboardData,
     error: dashboardError,
@@ -161,6 +184,25 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
     }
   }, [zonesData, zones]);
 
+  const { data: zonesInfo } = useQuery(POINTS_TO_BE_COLLECTED);
+  useEffect(() => {
+    if (zonesInfo) {
+      const filteredPointsToBeCollected = zonesInfo.pointsToBeCollected
+        .map((zone: PointsToBeCollected) => {
+          return zone;
+        })
+        // Filtrar zonas que tengan containers después de la filtración
+        .filter(
+          (zone: PointsToBeCollected) =>
+            zone.containers && zone.containers.length > 0
+        );
+
+      // Actualiza el estado con los puntos filtrados
+      setPointsToBeCollected(filteredPointsToBeCollected);
+      // Asumo que tienes una función setPointsToBeCollected para actualizar el estado
+    }
+  }, [zonesInfo]);
+
   // Pass the state and updater function through the context
   return (
     <ServerContext.Provider
@@ -176,6 +218,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
         statistics,
         sliderValue,
         setSliderValue,
+        pointsToBeCollected,
       }}
     >
       {children}

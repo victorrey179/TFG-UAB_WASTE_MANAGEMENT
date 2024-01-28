@@ -18,7 +18,7 @@ import { ServerProvider } from "./contexts/ServerContext";
 
 const App: React.FC = () => {
   return (
-    <LoadScript googleMapsApiKey="AIzaSyAZ4Ce8G0WK9ElAtz5sNeMAwygI4yntNlI">
+    <LoadScript googleMapsApiKey="AIzaSyA08ssfiC0pddKctt_tq6sLVFRofTy9WhI">
       <Router>
         <AuthProvider>
           <LanguageProvider>

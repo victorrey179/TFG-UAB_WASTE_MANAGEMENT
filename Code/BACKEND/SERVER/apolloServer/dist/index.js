@@ -14,14 +14,20 @@ const graphql_subscriptions_1 = require("graphql-subscriptions");
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const location_1 = require("./models/location");
+const users_1 = require("./models/users");
 require("./db");
 const mongodb_1 = require("mongodb");
 const graphql_tag_1 = __importDefault(require("graphql-tag"));
+const openai_1 = require("openai");
+const mongoose_1 = __importDefault(require("mongoose"));
 const pubsub = new graphql_subscriptions_1.PubSub();
 const SUBSCRIPTION_EVENTS = {
     UPDATED_DATA: "UPDATED_DATA",
     CREATED_DATA: "CREATED_DATA",
 };
+const openai = new openai_1.OpenAI({
+    apiKey: "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",
+});
 function getDurationInMilliseconds(duration) {
     const match = duration.match(/^(\d+)(min|h|d|sem|mes)$/);
     if (!match)
@@ -44,6 +50,35 @@ function getDurationInMilliseconds(duration) {
     }
 }
 const typeDefs = (0, graphql_tag_1.default) `
+  type User {
+    _id: ID!
+    userdata: UserData!
+  }
+
+  type UserData {
+    name: String!
+    surname: String!
+    password: String!
+    studies: String!
+    college: String!
+    niu: String!
+    totalpoints: Int!
+    container_data: ContainerData!
+  }
+
+  type ContainerData {
+    amarillo: ContainerPoints!
+    azul: ContainerPoints!
+    verde: ContainerPoints!
+    marron: ContainerPoints!
+    gris: ContainerPoints!
+  }
+
+  type ContainerPoints {
+    points: Int!
+    items: Int!
+  }
+
   type Measurement {
     acceleration: [Int]!
     distance: Int!
@@ -63,6 +98,7 @@ const typeDefs = (0, graphql_tag_1.default) `
   type Zone {
     _id: String!
     idZone: String!
+    coordinates: [Float]!
     containers: [Container]!
   }
   type DashboardData {
@@ -73,6 +109,11 @@ const typeDefs = (0, graphql_tag_1.default) `
     containerId: String!
     date: String!
     measurements: Measurement!
+  }
+  type PointsToBeCollected {
+    zoneId: String!
+    coordinates: [Float]!
+    containers: [Container]!
   }
   type Mutation {
     addData(
@@ -85,6 +126,23 @@ const typeDefs = (0, graphql_tag_1.default) `
       signal: Int
       temperature: Int
     ): Record
+    addUser(
+      name: String!
+      surname: String!
+      password: String!
+      studies: String!
+      college: String!
+      niu: String!
+    ): User!
+    modifyUser(
+      name: String!
+      surname: String!
+      password: String!
+      studies: String!
+      college: String!
+      niu: String!
+    ): User!
+    addPoints(niu: String!, container: String!, items: Int!): User!
   }
   type Query {
     numZones: Int!
@@ -92,6 +150,10 @@ const typeDefs = (0, graphql_tag_1.default) `
     zoneIds: [String]!
     dashboardStatistics(zoneId: String!, duration: String!): [DashboardData]!
     dashboardHTS(zoneId: String!): [DashboardHtsData]!
+    pointsToBeCollected: [PointsToBeCollected]!
+    totalPointsUser(niu: String!): Int!
+    pointsPerContainer(niu: String!): ContainerData!
+    login(niu: String!, password: String!): User
   }
   type Subscription {
     updatedData: Record!
@@ -162,6 +224,80 @@ const resolvers = {
             }
             return newRecord;
         },
+        addUser: async (root, args) => {
+            const { name, surname, password, studies, college, niu } = args;
+            const newUserdata = new users_1.UserData({
+                name,
+                surname,
+                password,
+                studies,
+                college,
+                niu,
+                totalpoints: 0,
+                container_data: {
+                    amarillo: { points: 0, items: 0 },
+                    azul: { points: 0, items: 0 },
+                    verde: { points: 0, items: 0 },
+                    marron: { points: 0, items: 0 },
+                    gris: { points: 0, items: 0 },
+                },
+            });
+            const newUser = new users_1.User({
+                _id: new mongoose_1.default.Types.ObjectId(), // Ensure ObjectId is generated correctly
+                userdata: newUserdata,
+            });
+            await newUser.save();
+            return newUser;
+        },
+        modifyUser: async (root, args) => {
+            const { name, surname, password, studies, college, niu } = args;
+            const user = await users_1.User.findOne({ "userdata.niu": niu });
+            if (user) {
+                user.userdata.name = name;
+                user.userdata.surname = surname;
+                user.userdata.password = password;
+                user.userdata.studies = studies;
+                user.userdata.college = college;
+                user.userdata.niu = niu;
+                await user.save();
+                return user;
+            }
+            else {
+                throw new Error("User not found");
+            }
+        },
+        addPoints: async (root, args) => {
+            const { niu, container, items } = args;
+            const user = await users_1.User.findOne({ "userdata.niu": niu });
+            const points = () => {
+                if (container === "amarillo") {
+                    return items * 20;
+                }
+                else if (container === "azul") {
+                    return items * 15;
+                }
+                else if (container === "verde") {
+                    return items * 30;
+                }
+                else if (container === "marron") {
+                    return items * 25;
+                }
+                else if (container === "gris") {
+                    return items * 10;
+                }
+            };
+            if (user) {
+                const pointsToAdd = points();
+                user.userdata.totalpoints += pointsToAdd;
+                user.userdata.container_data[container].points += pointsToAdd;
+                user.userdata.container_data[container].items += items;
+                await user.save();
+                return user;
+            }
+            else {
+                throw new Error("User not found");
+            }
+        },
     },
     Query: {
         numZones: async () => location_1.ZoneModel.collection.countDocuments(),
@@ -230,6 +366,77 @@ const resolvers = {
                 throw new Error("Server error");
             }
         },
+        pointsToBeCollected: async () => {
+            const zones = await location_1.ZoneModel.find().select("idZone -_id");
+            const zoneIds = zones.map((zone) => zone.idZone);
+            try {
+                // Si zoneIds está vacío, devuelve un arreglo vacío
+                if (!zoneIds || zoneIds.length === 0) {
+                    return [];
+                }
+                // Encuentra todas las zonas correspondientes a los IDs proporcionados
+                const zones = await location_1.ZoneModel.find({ idZone: { $in: zoneIds } });
+                const pointsToBeCollected = zones.map((zone) => {
+                    const containersToBeCollected = zone.containers.filter((container) => {
+                        // Encuentra el último registro para cada contenedor
+                        const lastRecord = container.data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                        // Verifica si la última 'distance' registrada es menor a 50 cm
+                        return lastRecord && lastRecord.measurements.distance < 50;
+                    });
+                    return {
+                        zoneId: zone.idZone,
+                        containers: containersToBeCollected,
+                        coordinates: zone.coordinates,
+                    };
+                });
+                return pointsToBeCollected;
+            }
+            catch (error) {
+                console.error("Error al obtener los puntos a recolectar", error);
+                throw new Error("Server error");
+            }
+        },
+        totalPointsUser: async (root, args) => {
+            try {
+                const { niu } = args;
+                const user = await users_1.User.findOne({ "userdata.niu": niu }).select("userdata.totalpoints -_id");
+                if (!user) {
+                    return 0; // or return 0, depending on your schema requirements
+                }
+                return user.userdata.totalpoints;
+            }
+            catch (error) {
+                console.error("Error fetching total points:", error);
+                throw new Error("Error fetching total points for user");
+            }
+        },
+        pointsPerContainer: async (root, args) => {
+            const { niu } = args;
+            const user = await users_1.User.findOne({ "userdata.niu": niu }).select("userdata.container_data -_id");
+            if (!user) {
+                return [];
+            }
+            return user.userdata.container_data;
+        },
+        login: async (root, args) => {
+            const { niu, password } = args;
+            try {
+                const user = await users_1.User.findOne({ "userdata.niu": niu });
+                if (!user) {
+                    throw new Error("User not found");
+                }
+                const isMatch = password === user.userdata.password;
+                if (!isMatch) {
+                    throw new Error("Invalid credentials");
+                }
+                return user;
+            }
+            catch (error) {
+                console.error("Login error:", error);
+                // Lanzar el error original para obtener más detalles
+                throw error;
+            }
+        },
     },
     Subscription: {
         updatedData: {
@@ -247,15 +454,45 @@ const httpServer = (0, http_1.createServer)(app);
     // Creación del servidor Apollo
     const server = new server_1.ApolloServer({
         schema,
-        plugins: [
-            (0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer }),
-        ],
+        plugins: [(0, drainHttpServer_1.ApolloServerPluginDrainHttpServer)({ httpServer })],
     });
     // Iniciar Apollo Server y aplicar middlewares
     await server.start();
     app.use((0, cors_1.default)());
     app.use(body_parser_1.default.json());
-    app.post('/data', async (req, res) => {
+    app.get("/visionGpt", async (req, res) => {
+        const { image } = req.body;
+        try {
+            const response = await openai.chat.completions.create({
+                model: "gpt-4-vision-preview",
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "text",
+                                text: "Give me a description about this object, give me the material or materials which is made from 100% sure to 50% sure in a json format",
+                            },
+                            {
+                                type: "image_url",
+                                image_url: {
+                                    url: "data:image/jpeg;base64," + image,
+                                    detail: "low",
+                                },
+                            },
+                        ],
+                    },
+                ],
+            });
+            console.log(response.choices[0]);
+            res.send("WorkingOn");
+        }
+        catch (error) {
+            console.error("Error:", error);
+            res.send(error);
+        }
+    });
+    app.post("/data", async (req, res) => {
         try {
             // { location: 'Zona1_Azul', x: 100, y: 200, z: 300, distance: 50, humidity: 60, signal: 70, temperature: 25 }
             const data = req.body;
@@ -268,24 +505,29 @@ const httpServer = (0, http_1.createServer)(app);
                 distance: data.distance,
                 humidity: data.humidity,
                 signal: data.signal,
-                temperature: data.temperature
+                temperature: data.temperature,
             };
             // Llamar directamente al resolver de la mutación
             const result = await resolvers.Mutation.addData(null, dataToFill);
             // Enviar respuesta de éxito
-            res.status(200).json({ message: 'Datos agregados correctamente', record: result });
+            res
+                .status(200)
+                .json({ message: "Datos agregados correctamente", record: result });
         }
         catch (error) {
             console.error(error);
-            res.status(500).send('Error al procesar los datos');
+            res.status(500).send("Error al procesar los datos");
         }
     });
-    app.use('/graphql', (0, express4_1.expressMiddleware)(server));
+    app.use("/graphql", (0, express4_1.expressMiddleware)(server));
     // Creación del servidor WebSocket para suscripciones
-    const wsServer = new ws_1.WebSocketServer({ server: httpServer, path: '/graphql' });
+    const wsServer = new ws_1.WebSocketServer({
+        server: httpServer,
+        path: "/graphql",
+    });
     // Iniciar el servidor HTTP
-    httpServer.listen(4000, '192.168.1.132', () => {
-        console.log(`🚀 Server is running on http://192.168.1.132:4000/graphql`);
-        console.log(`🚀 WebSocket is running on ws://192.168.1.132:4000/graphql`);
+    httpServer.listen(4000, "192.168.1.33", () => {
+        console.log(`🚀 Server is running on http://192.168.1.33:4000/graphql`);
+        console.log(`🚀 WebSocket is running on ws://192.168.1.33:4000/graphql`);
     });
 })();

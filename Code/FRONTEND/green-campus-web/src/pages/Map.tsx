@@ -1,9 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { DirectionsRenderer, GoogleMap, Marker } from "@react-google-maps/api";
 import Layout from "../components/Layout";
 import { GridLoader } from "react-spinners";
+import { useServerContext } from "../contexts/ServerContext";
+
+type Coords = {
+  lat: number;
+  lng: number;
+};
+
 
 const Map: React.FC = () => {
+  const { pointsToBeCollected } = useServerContext();
+  const [directions, setDirections] =
+    useState<google.maps.DirectionsResult | null>(null);
+  const [waypoints, setWaypoints] = useState<Coords[]>([]);
+  useEffect(() => {
+    if (pointsToBeCollected && pointsToBeCollected.length > 0) {
+      
+      const newWaypoints: Coords[] = pointsToBeCollected.map(point => ({
+        lat: point.coordinates[0], // Asegúrate de que estos nombres de campo coincidan con la estructura de tus datos
+        lng: point.coordinates[1],
+      }));
+      
+      setWaypoints(newWaypoints);
+      
+      // Si necesitas buscar direcciones inmediatamente después de actualizar waypoints, puedes hacerlo aquí
+      if (newWaypoints.length >= 2) {
+        fetchDirections(newWaypoints);
+      }
+    }
+  }, [pointsToBeCollected]);
+  
+  const fetchDirections = (waypoints: Coords[]) => {
+    const directionsService = new google.maps.DirectionsService();
+
+    const origin = waypoints[0]; // El punto de inicio
+    const destination = waypoints[waypoints.length - 1]; // El punto final
+    const waypointsIntermediate = waypoints
+      .slice(1, waypoints.length - 1)
+      .map((waypoint) => ({
+        location: waypoint,
+        stopover: true,
+      }));
+
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        waypoints: waypointsIntermediate,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        console.log(result); // Agrega esto para depurar
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          setDirections(result);
+        } else {
+          console.error(`Error al obtener direcciones: ${status}`);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    // Asegúrate de que los waypoints estén definidos antes de llamar a fetchDirections
+    if (waypoints.length >= 2) {
+      fetchDirections(waypoints);
+    }
+  }, [waypoints]);
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(
     null
   );
@@ -229,6 +293,15 @@ const Map: React.FC = () => {
     },
   ];
 
+  const whiteMarkerIcon = {
+    path: window.google.maps.SymbolPath.CIRCLE, // Esto crea un círculo, puedes usar otras formas
+    scale: 5, // Tamaño del marcador
+    fillColor: "#FFFFFF", // Color blanco para el relleno
+    fillOpacity: 0.8,
+    strokeColor: "#FFFFFF", // Color blanco para el borde
+    strokeWeight: 1,
+  };
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -283,6 +356,16 @@ const Map: React.FC = () => {
               position={center}
               icon={markerIcon} // Añade la prop icon aquí
             />
+            {directions && (
+              <DirectionsRenderer
+                directions={directions}
+                options={{
+                  markerOptions: {
+                    icon: whiteMarkerIcon, // Usar el icono personalizado aquí
+                  },
+                }}
+              />
+            )}
           </GoogleMap>
         )}
       </div>

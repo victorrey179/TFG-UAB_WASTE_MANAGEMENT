@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const ZONES_QUERY = gql`
   query {
-    zoneIds 
+    zoneIds
   }
 `;
 
@@ -37,6 +37,18 @@ export const DASHBOARD_HTS_QUERY = gql`
         signal
         temperature
       }
+    }
+  }
+`;
+
+export const POINTS_TO_BE_COLLECTED = gql`
+  query Containers {
+    pointsToBeCollected {
+      containers {
+        idContainer
+      }
+      zoneId
+      coordinates
     }
   }
 `;

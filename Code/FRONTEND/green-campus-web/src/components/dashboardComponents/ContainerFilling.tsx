@@ -1,8 +1,8 @@
 import React from "react";
 import { useServerContext } from "../../contexts/ServerContext"; // Asegúrate de que la ruta de importación sea correcta
 import { ActivityRings } from "@jonasdoesthings/react-activity-rings";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { v4 as uuidv4 } from 'uuid';
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { v4 as uuidv4 } from "uuid";
 
 const scale = (
   num: number,
@@ -63,21 +63,21 @@ const ContainerFilling: React.FC = () => {
             ></div>
           </div>
           <div className="flex h-[50%]">
-            {/* Asumiendo que tienes una lógica para calcular los porcentajes basados en los datos */}
             <ActivityRings
               key={uuidv4()}
               rings={[
                 {
                   filledPercentage:
                     1 - scale(item.measurements.distance, 0, 170, 0, 100) / 100,
-                  color: getColorForFilling(100 - scale(item.measurements.distance, 0, 170, 0, 100)),
+                  color: getColorForFilling(
+                    100 - scale(item.measurements.distance, 0, 170, 0, 100)
+                  ),
                 },
               ]}
               options={{
                 containerHeight: "17vh",
                 containerWidth: "17vh",
                 backgroundOpacity: 0.2,
-
               }}
             />
           </div>
@@ -85,13 +85,17 @@ const ContainerFilling: React.FC = () => {
             <div className="flex flex-row gap-1 items-center">
               <DeleteOutlineOutlinedIcon
                 style={{
-                  color: getColorForFilling(100 - scale(item.measurements.distance, 0, 170, 0, 100)),
+                  color: getColorForFilling(
+                    100 - scale(item.measurements.distance, 0, 170, 0, 100)
+                  ),
                 }}
               />
               <h2
                 className="flex text-lg font-bold"
                 style={{
-                  color: getColorForFilling(100 - scale(item.measurements.distance, 0, 170, 0, 100)),
+                  color: getColorForFilling(
+                    100 - scale(item.measurements.distance, 0, 170, 0, 100)
+                  ),
                 }}
               >
                 {`${(
