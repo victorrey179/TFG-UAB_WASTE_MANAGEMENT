@@ -19,7 +19,9 @@ import { OpenAI } from "openai";
 import { client, CLIENT_ID } from "./auth";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-
+import * as dotenv from "dotenv";
+dotenv.config();
+const openaiApiKey: string = process.env.OPENAI_API_KEY || '';
 const pubsub = new PubSub();
 
 const SUBSCRIPTION_EVENTS = {
@@ -28,7 +30,7 @@ const SUBSCRIPTION_EVENTS = {
 };
 
 const openai = new OpenAI({
-  apiKey: "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",
+  apiKey: openaiApiKey,
 });
 
 function getDurationInMilliseconds(duration: String): number {
