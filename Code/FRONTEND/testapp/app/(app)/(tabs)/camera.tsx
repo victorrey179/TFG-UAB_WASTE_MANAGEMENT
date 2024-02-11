@@ -22,7 +22,8 @@ export default function Scanner() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const cameraRef = useRef<Camera>(null);
-  const { visionRequest } = useCameraContext();
+  const { visionRequest, setImageUri, setGptVisionInfo, gptVisionInfo } =
+    useCameraContext();
 
   useEffect(() => {
     setType(CameraType.back); // Establecer el tipo de cámara por defecto
@@ -47,8 +48,11 @@ export default function Scanner() {
   async function takePicture() {
     if (cameraRef.current) {
       try {
+        setGptVisionInfo(null);
         const photo = await cameraRef.current.takePictureAsync();
-        visionRequest(photo, photo.uri);
+        console.log("foto hecha");
+        setImageUri(photo.uri);
+        await visionRequest(photo, photo.uri);
       } catch (error) {
         console.error("Error al tomar foto:", error);
       }

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {gql} from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const ADD_POINTS = gql`
   mutation Mutation($niu: String!, $container: String!, $items: Int!) {
@@ -205,6 +205,18 @@ export const LOGIN = gql`
           }
         }
       }
+    }
+  }
+`;
+
+export const COORDINATES_CONTAINERS = gql`
+  query Query {
+    allInfo {
+      containers {
+        idContainer
+      }
+      coordinates
+      idZone
     }
   }
 `;

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,13 +43,43 @@ const mongodb_1 = require("mongodb");
 const graphql_tag_1 = __importDefault(require("graphql-tag"));
 const openai_1 = require("openai");
 const mongoose_1 = __importDefault(require("mongoose"));
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
+const openaiApiKey = process.env.OPENAI_API_KEY || "";
 const pubsub = new graphql_subscriptions_1.PubSub();
+function transformResponse(responseData) {
+    let content = responseData.message.content || '';
+    // Extraer la composición y dividir la descripción y la información adicional
+    const regex = /\{([^}]+)\}/;
+    const compositionMatch = content.match(regex);
+    let description = '';
+    let moreInfo = '';
+    const compositionData = {};
+    if (compositionMatch && compositionMatch.index !== undefined) {
+        description = content.substring(0, compositionMatch.index).trim();
+        moreInfo = content.substring(compositionMatch.index + compositionMatch[0].length).trim();
+        const components = compositionMatch[1].split(',');
+        components.forEach((item) => {
+            const parts = item.split(':').map(part => part.trim());
+            if (parts.length === 2) {
+                compositionData[parts[0]] = parts[1];
+            }
+        });
+    }
+    return {
+        data: {
+            description,
+            moreInfo,
+            composition: compositionData
+        }
+    };
+}
 const SUBSCRIPTION_EVENTS = {
     UPDATED_DATA: "UPDATED_DATA",
     CREATED_DATA: "CREATED_DATA",
 };
 const openai = new openai_1.OpenAI({
-    apiKey: "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",
+    apiKey: openaiApiKey,
 });
 function getDurationInMilliseconds(duration) {
     const match = duration.match(/^(\d+)(min|h|d|sem|mes)$/);
@@ -449,6 +502,9 @@ const resolvers = {
 };
 const schema = (0, schema_1.makeExecutableSchema)({ typeDefs, resolvers });
 const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
+app.use(body_parser_1.default.json({ limit: "50mb" })); // or higher if needed
+app.use(body_parser_1.default.urlencoded({ limit: "50mb", extended: true }));
 const httpServer = (0, http_1.createServer)(app);
 (async () => {
     // Creación del servidor Apollo
@@ -458,9 +514,7 @@ const httpServer = (0, http_1.createServer)(app);
     });
     // Iniciar Apollo Server y aplicar middlewares
     await server.start();
-    app.use((0, cors_1.default)());
-    app.use(body_parser_1.default.json());
-    app.get("/visionGpt", async (req, res) => {
+    app.post("/visionGpt", async (req, res) => {
         const { image } = req.body;
         try {
             const response = await openai.chat.completions.create({
@@ -471,21 +525,25 @@ const httpServer = (0, http_1.createServer)(app);
                         content: [
                             {
                                 type: "text",
-                                text: "Give me a description about this object, give me the material or materials which is made from 100% sure to 50% sure in a json format",
+                                text: "What is this? Provide an estimated percentage of material, such as plastic, glass, organic, paper, textil, medical etc. i give you an example:  The image appears to show a worn-out textile item, possibly a garment like a sock or glove, with significant fraying and holes. Based on what's visible, I can estimate the following:\n" +
+                                    "\n" +
+                                    "{textil: >90%}",
                             },
                             {
                                 type: "image_url",
                                 image_url: {
-                                    url: "data:image/jpeg;base64," + image,
-                                    detail: "low",
+                                    url: `data:image/jpeg;base64,${image}`,
                                 },
                             },
                         ],
                     },
                 ],
+                max_tokens: 175,
             });
-            console.log(response.choices[0]);
-            res.send("WorkingOn");
+            console.log(response.choices);
+            const transformedData = transformResponse(response.choices[0]);
+            console.log(transformedData);
+            res.send(transformedData);
         }
         catch (error) {
             console.error("Error:", error);
@@ -526,8 +584,8 @@ const httpServer = (0, http_1.createServer)(app);
         path: "/graphql",
     });
     // Iniciar el servidor HTTP
-    httpServer.listen(4000, "192.168.1.33", () => {
-        console.log(`🚀 Server is running on http://192.168.1.33:4000/graphql`);
-        console.log(`🚀 WebSocket is running on ws://192.168.1.33:4000/graphql`);
+    httpServer.listen(4000, "192.168.1.34", () => {
+        console.log(`🚀 Server is running on http://192.168.1.34:4000/graphql`);
+        console.log(`🚀 WebSocket is running on ws://192.168.1.34:4000/graphql`);
     });
 })();

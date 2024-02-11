@@ -9,15 +9,8 @@ import {
 } from "react-native";
 import Card from "../../../components/Card";
 import Colors from "../../../constants/Colors";
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
-} from "react-native-chart-kit";
-import ClassificationChart from "../../../components/charts/ClassificationChart";
+import Caroussel from "@/components/Caroussel";
+import RankingList from "@/components/Ranking";
 
 const screenWidth = Dimensions.get("window").width;
 const cardMargin = 15; // Margen a derecha e izquierda para cada tarjeta
@@ -85,31 +78,13 @@ export default function TabOneScreen() {
           </Text>
         </View>
         <View style={styles.cardContainer}>
-          <Card
-            title="Clasificaciones en contenedores"
-            children={<ClassificationChart />}
-          />
+          <Caroussel />
         </View>
-        <View style={styles.cardContainer}>
-          <Card title="Historial" children={undefined} />
-        </View>
-        <View style={styles.cardContainer}>
-          <Card title="Ranking" children={undefined} />
-        </View>
+        {/* <View style={styles.cardContainer}>
+          <Card title="Ranking" children={<RankingList/>} />
+        </View> */}
         <View style={styles.cardContainer}>
           <Card title="Premios" children={undefined} />
-        </View>
-        <View style={styles.cardContainer}>
-          <Card title="Resumen" children={undefined} />
-        </View>
-        <View style={styles.cardContainer}>
-          <Card title="Historial" children={undefined} />
-        </View>
-        <View style={styles.cardContainer}>
-          <Card title="Resumen" children={undefined} />
-        </View>
-        <View style={styles.cardContainer}>
-          <Card title="Historial" children={undefined} />
         </View>
       </View>
     </ScrollView>

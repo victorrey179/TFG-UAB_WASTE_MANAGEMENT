@@ -4,15 +4,35 @@ import React, {
   createContext,
   useContext,
   ReactNode,
-} from 'react';
-import {useQuery, useMutation} from '@apollo/client';
+  useState,
+  useEffect,
+} from "react";
+import { useQuery, useMutation } from "@apollo/client";
 import {
   ADD_POINTS,
   TOTAL_POINTS_USER,
   POINTS_PER_CONTAINER,
   MODIFY_USER,
   ADD_USER,
-} from './Queries';
+  COORDINATES_CONTAINERS,
+} from "./Queries";
+import { useAuth } from "./AuthContext";
+
+interface Container {
+  idContainer: string;
+}
+
+interface LocationInfo {
+  containers: Container[];
+  coordinates: [number, number];
+}
+
+// Tipo para la respuesta de la API
+interface ApiResponse {
+  data: {
+    allInfo: LocationInfo[];
+  };
+}
 
 interface IContainerData {
   points: number;
@@ -41,111 +61,90 @@ interface IUser {
   userdata: IUserData;
 }
 
-interface ServerContextData {
-  addUser: (
-    name: string,
-    surname: string,
-    password: string,
-    studies: string,
-    college: string,
-    niu: string,
-  ) => Promise<IUser | null>;
-  modifyUser: (
-    name: string,
-    surname: string,
-    password: string,
-    studies: string,
-    college: string,
-    niu: string,
-  ) => Promise<IUser | null>;
-  addPoints: (
-    niu: string,
-    container: string,
-    items: number,
-  ) => Promise<IUser | null>;
-  totalPointsUser: (niu: string) => Promise<number>;
-  pointsPerContainer: (niu: string) => Promise<IContainerData[]>;
-
+// Definición de un tipo para el objeto principal que contiene los contenedores
+interface IPointsPerContainer {
+  amarillo: IContainerData;
+  azul: IContainerData;
+  verde: IContainerData;
+  marron: IContainerData;
+  gris: IContainerData;
 }
 
-const defaultContextValue: ServerContextData = {
-  addUser: async () => null,
-  modifyUser: async () => null,
-  addPoints: async () => null,
-  totalPointsUser: async () => 0,
-  pointsPerContainer: async () => [],
+// Definición del tipo para la estructura de datos completa
+interface IPointsPerContainerData {
+  data: {
+    pointsPerContainer: IPointsPerContainer;
+  };
+}
 
-};
+const ServerContext = createContext<any>(null);
 
-export const ServerContext =
-  createContext<ServerContextData>(defaultContextValue);
+export function useServer() {
+  return useContext(ServerContext);
+}
 
 interface ServerProviderProps {
   children: ReactNode;
 }
 
-export const ServerProvider: React.FC<ServerProviderProps> = ({children}) => {
-  const [addPointsMutation] = useMutation(ADD_POINTS);
-  const [modifyUserMutation] = useMutation(MODIFY_USER);
-  const [addUserMutation] = useMutation(ADD_USER);
+export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
+  const [containerColors, setContainerColors] = useState<Container[]>([]);
+  const [pointsPerContainer, setPointsPerContainer] =
+    useState<IPointsPerContainerData>();
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  const { user } = useAuth();
 
+  // Connect to the server and handle updates
 
-  const addUser = async (
-    name: string,
-    surname: string,
-    password: string,
-    studies: string,
-    college: string,
-    niu: string,
-  ) => {
-    const {data} = await addUserMutation({
-      variables: {name, surname, password, studies, college, niu},
-    });
-    return data?.addUser;
+  const saveContainerColors = (containersData: Container[]) => {
+    setContainerColors(containersData);
   };
 
-  const modifyUser = async (
-    name: string,
-    surname: string,
-    password: string,
-    studies: string,
-    college: string,
-    niu: string,
-  ) => {
-    const {data} = await modifyUserMutation({
-      variables: {name, surname, password, studies, college, niu},
-    });
-    return data?.modifyUser;
-  };
+  const {
+    data: pointsPerContainerData,
+    error: pointsPerContainerError,
+    loading: pointsPerContainerLoading,
+  } = useQuery(POINTS_PER_CONTAINER, { variables: { niu: user } });
 
-  const addPoints = async (niu: string, container: string, items: number) => {
-    const {data} = await addPointsMutation({
-      variables: {niu, container, items},
-    });
-    return data?.addPoints;
-  };
+  useEffect(() => {
+    if (pointsPerContainerData) {
+      console.log("data: ", pointsPerContainerData);
+      setPointsPerContainer(pointsPerContainerData);
+    }
+  }, [pointsPerContainerData]);
+  useEffect(() => {
+    if (pointsPerContainerError) {
+      console.log("error" + pointsPerContainerError);
+    }
+  }, [pointsPerContainerError]);
+  useEffect(() => {
+    if (pointsPerContainerLoading) {
+      console.log("loading" + pointsPerContainerLoading);
+    }
+  }, [pointsPerContainerLoading]);
 
-  const totalPointsUser = async (niu: string) => {
-    const {data} = await useQuery(TOTAL_POINTS_USER, {variables: {niu}});
-    return data?.totalPointsUser;
-  };
+  const {
+    data: totalPointsData,
+    error: totalPointsError,
+    loading: totalPointsLoading,
+  } = useQuery(TOTAL_POINTS_USER, { variables: { user }});
 
-  const pointsPerContainer = async (niu: string) => {
-    const {data} = await useQuery(POINTS_PER_CONTAINER, {variables: {niu}});
-    return data?.pointsPerContainer;
-  };
-
+  useEffect(() => {
+    if (totalPointsData) {
+      setTotalPoints(totalPointsData);
+    }
+  }, [totalPointsData]);
 
   // Provide functions and state through context
   return (
     <ServerContext.Provider
       value={{
-        addUser,
-        modifyUser,
-        addPoints,
-        totalPointsUser,
+        totalPoints,
         pointsPerContainer,
-      }}>
+        containerColors,
+        saveContainerColors,
+      }}
+    >
       {children}
     </ServerContext.Provider>
   );

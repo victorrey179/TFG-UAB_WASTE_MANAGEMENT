@@ -5,11 +5,11 @@ import HTS from "../components/dashboardComponents/HTS";
 import MeasurementConfiguration from "../components/dashboardComponents/MeasurementConfiguration";
 import SystemAlerts from "../components/dashboardComponents/SystemAlerts";
 import Calendar from "../components/dashboardComponents/Calendar";
-import Searcher from "../components/dashboardComponents/Searcher";
+//import Searcher from "../components/dashboardComponents/Searcher";
 import StateContainerChart from "../components/dashboardComponents/StateContainerChart";
 import ContainerFilling from "../components/dashboardComponents/ContainerFilling";
 import GeneralState from "../components/dashboardComponents/GeneralState";
-import Tune from "../components/dashboardComponents/Tune";
+//import Tune from "../components/dashboardComponents/Tune";
 
 const Dashboard: React.FC = () => {
   return (
@@ -32,7 +32,7 @@ const Dashboard: React.FC = () => {
                     <div className="h-1/6 flex bg-dark-primary gap-4 p-2 rounded-xl">
                       <MeasurementConfiguration />
                     </div>
-                    <div className="h-5/6 flex bg-dark-primary gap-4 p-2 rounded-xl">
+                    <div className="h-5/6 flex bg-dark-primary gap-4 rounded-xl w-full">
                       <SystemAlerts />
                     </div>
                   </div>
@@ -47,19 +47,20 @@ const Dashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex flex-col w-1/2 gap-4">
-                      <div className="flex h-[13%] gap-4">
-                        <div className="bg-dark-primary rounded-xl w-[87%] p-2">
+                      {/* <div className="flex h-[13%] gap-4"> */}
+                        {/* <div className="bg-dark-primary rounded-xl w-[87%] p-2">
                           <h2 className="text-xl font-bold">
                             <Searcher />
                           </h2>
-                        </div>
-                        <div className="bg-dark-primary rounded-xl w-[13%] p-2">
+                        </div> */}
+                        {/* <div className="bg-dark-primary rounded-xl w-[13%] p-2">
                           <h2 className="text-xl font-bold">
                             <Tune />
                           </h2>
-                        </div>
-                      </div>
-                      <div className="flex h-[87%] p-2 bg-dark-primary rounded-xl">
+                        </div> */}
+                      {/* </div> */}
+                      {/* <div className="flex h-[87%] p-2 bg-dark-primary rounded-xl"> */}
+                      <div className="flex h-[100%] bg-dark-primary rounded-xl">
                         <GeneralState />
                       </div>
                     </div>

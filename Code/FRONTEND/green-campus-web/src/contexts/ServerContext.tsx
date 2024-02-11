@@ -13,8 +13,9 @@ import {
   STATISTICS_QUERY,
   DASHBOARD_HTS_QUERY,
   POINTS_TO_BE_COLLECTED,
+  ALL_INFO
 } from "./Queries";
-import { CREATED_DATA, UPDATED_DATA } from "./Subscriptions";
+//import { CREATED_DATA, UPDATED_DATA } from "./Subscriptions";
 
 // Define the expected shape of measurements
 interface Measurements {
@@ -125,6 +126,21 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
   const [pointsToBeCollected, setPointsToBeCollected] = useState<
     PointsToBeCollected[]
   >([]);
+  const [generalData, setGeneralData] = useState<PointsToBeCollected[]>([]);
+  
+  const {
+    data: allData,
+    error: allError,
+    loading: allLoading,
+  } = useQuery(ALL_INFO);
+
+  // Connect to the server and handle updates
+  useEffect(() => {
+    if (allData) {
+      console.log(allData);
+      setGeneralData(allData.allInfo);
+    }
+  }, [allData]);
 
   const {
     data: dashboardData,
@@ -140,6 +156,7 @@ export const ServerProvider: React.FC<ServerProviderProps> = ({ children }) => {
   // Connect to the server and handle updates
   useEffect(() => {
     if (dashboardData) {
+      console.log(dashboardData);
       setData(dashboardData.dashboardHTS);
     }
   }, [data, dashboardData, currentZoneIndex, zones]);

@@ -3,19 +3,21 @@ import React from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import Card from "./Card";
+import ClassificationChart from "./charts/ClassificationChart";
 
-const { width } = Dimensions.get("window");
+const screenWidth = Dimensions.get("window").width;
+const cardMargin = 15;
 
-export default function TabOneScreen() {
+export default function Caroussel() {
   // Datos de ejemplo para los carruseles
   const carouselItems = [
     {
-      title: "Cardio",
-      subtitle: "20 Minutes",
+      title: "Clasificaciones por contenedores",
+      data: "classification",
     },
     {
-      title: "Strength",
-      subtitle: "15 Minutes",
+      title: "Puntos por contenedores",
+      data: "points",
     },
     // Agrega más elementos según sea necesario
   ];
@@ -23,33 +25,27 @@ export default function TabOneScreen() {
   // Renderiza un elemento del carrusel
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     return (
-      <Card title={item.title} subtitle={item.subtitle} children={undefined} />
+      <Card
+        title={item.title}
+        children={
+          <ClassificationChart show={item.data} />
+        }
+      />
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View>
       <Carousel
         data={carouselItems}
         renderItem={renderItem}
-        sliderWidth={width}
-        itemWidth={300}
+        sliderWidth={screenWidth - 2 * cardMargin}
+        itemWidth={screenWidth - 2 * cardMargin}
       />
-      <Carousel
-        data={carouselItems}
-        renderItem={renderItem}
-        sliderWidth={width}
-        itemWidth={300}
-      />
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 15,
-    backgroundColor: "#f0f0f0",
-  },
+  
 });

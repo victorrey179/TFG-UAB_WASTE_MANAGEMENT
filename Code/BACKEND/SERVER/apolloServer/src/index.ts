@@ -21,8 +21,64 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import * as dotenv from "dotenv";
 dotenv.config();
-const openaiApiKey: string = process.env.OPENAI_API_KEY || '';
+const openaiApiKey: string = process.env.OPENAI_API_KEY || "";
 const pubsub = new PubSub();
+
+interface ChoiceData {
+  message: {
+    role: string;
+    content: string | null;
+  };
+  finish_reason: string;
+  index: number;
+}
+
+interface CompositionData {
+  [key: string]: string;
+}
+
+interface GeneralizedResponse {
+  data: {
+    description: string;
+    moreInfo: string;
+    composition: CompositionData;
+  };
+}
+
+function transformResponse(responseData: ChoiceData): GeneralizedResponse {
+  let content = responseData.message.content || '';
+
+  // Extraer la composición y dividir la descripción y la información adicional
+  const regex = /\{([^}]+)\}/;
+  const compositionMatch = content.match(regex);
+
+  let description = '';
+  let moreInfo = '';
+  const compositionData: CompositionData = {};
+
+  if (compositionMatch && compositionMatch.index !== undefined) {
+    description = content.substring(0, compositionMatch.index).trim();
+    moreInfo = content.substring(compositionMatch.index + compositionMatch[0].length).trim();
+
+    const components = compositionMatch[1].split(',');
+
+    components.forEach((item) => {
+      const parts = item.split(':').map(part => part.trim());
+      if (parts.length === 2) {
+        compositionData[parts[0]] = parts[1];
+      }
+    });
+  }
+
+  return {
+    data: {
+      description,
+      moreInfo,
+      composition: compositionData
+    }
+  };
+}
+
 
 const SUBSCRIPTION_EVENTS = {
   UPDATED_DATA: "UPDATED_DATA",
@@ -517,6 +573,9 @@ const resolvers = {
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const app = express();
+app.use(cors());
+app.use(bodyParser.json({ limit: "50mb" })); // or higher if needed
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 const httpServer = createServer(app);
 
 (async () => {
@@ -527,9 +586,7 @@ const httpServer = createServer(app);
   });
   // Iniciar Apollo Server y aplicar middlewares
   await server.start();
-  app.use(cors());
-  app.use(bodyParser.json());
-  app.get("/visionGpt", async (req, res) => {
+  app.post("/visionGpt", async (req, res) => {
     const { image } = req.body;
     try {
       const response = await openai.chat.completions.create({
@@ -540,21 +597,26 @@ const httpServer = createServer(app);
             content: [
               {
                 type: "text",
-                text: "Give me a description about this object, give me the material or materials which is made from 100% sure to 50% sure in a json format",
+                text:
+                  "What is this? Provide an estimated percentage of material, such as plastic, glass, organic, paper, textil, medical etc. i give you an example:  The image appears to show a worn-out textile item, possibly a garment like a sock or glove, with significant fraying and holes. Based on what's visible, I can estimate the following:\n" +
+                  "\n" +
+                  "{textil: >90%}",
               },
               {
                 type: "image_url",
                 image_url: {
-                  url: "data:image/jpeg;base64," + image,
-                  detail: "low",
+                  url: `data:image/jpeg;base64,${image}`,
                 },
               },
             ],
           },
         ],
+        max_tokens: 175,
       });
-      console.log(response.choices[0]);
-      res.send("WorkingOn");
+      console.log(response.choices);
+      const transformedData = transformResponse(response.choices[0]);
+      console.log(transformedData);
+      res.send(transformedData);
     } catch (error) {
       console.error("Error:", error);
       res.send(error);
@@ -598,8 +660,8 @@ const httpServer = createServer(app);
   });
 
   // Iniciar el servidor HTTP
-  httpServer.listen(4000, "192.168.1.33", () => {
-    console.log(`🚀 Server is running on http://192.168.1.33:4000/graphql`);
-    console.log(`🚀 WebSocket is running on ws://192.168.1.33:4000/graphql`);
+  httpServer.listen(4000, "192.168.1.34", () => {
+    console.log(`🚀 Server is running on http://192.168.1.34:4000/graphql`);
+    console.log(`🚀 WebSocket is running on ws://192.168.1.34:4000/graphql`);
   });
 })();

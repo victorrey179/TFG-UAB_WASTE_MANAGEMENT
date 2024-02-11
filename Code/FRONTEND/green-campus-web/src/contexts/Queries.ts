@@ -52,3 +52,22 @@ export const POINTS_TO_BE_COLLECTED = gql`
     }
   }
 `;
+
+export const ALL_INFO = gql`
+  query Query {
+    allInfo {
+      containers {
+        data {
+          measurements {
+            distance
+            humidity
+            signal
+            temperature
+          }
+          id
+        }
+        idContainer
+      }
+    }
+  }
+`;
