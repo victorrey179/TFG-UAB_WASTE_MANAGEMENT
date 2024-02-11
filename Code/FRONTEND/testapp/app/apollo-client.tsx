@@ -24,7 +24,7 @@ import { ApolloClient, InMemoryCache, HttpLink, split } from "@apollo/client";
 // );
 
 const client = new ApolloClient({
-  uri: "http://192.168.1.33:4000/graphql",
+  uri: "http://192.168.1.34:4000/graphql",
   cache: new InMemoryCache(),
 });
 

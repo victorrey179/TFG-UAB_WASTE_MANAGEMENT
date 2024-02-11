@@ -1,122 +1,100 @@
-import { View, Text, ActivityIndicator } from "react-native";
-import { StyleSheet } from "react-native";
-import { useState } from "react";
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, Button, Alert } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { Link, router } from "expo-router";
+import { Modal } from 'react-native';
 
-interface Container {
-  idContainer: string;
-}
-
-interface LocationInfo {
-  distance?: number;
-  containers: Container[];
-  coordinates: [number, number];
-  idZone: string;
-  isVisible: boolean;
-}
-
-// Tipo para la respuesta de la API
-interface ApiResponse {
-  allInfo: LocationInfo[];
-}
-
-const getColor = (idContainer: string) => {
+function getColor(idContainer: string) {
   switch (idContainer) {
-    case "amarillo":
+    case "amarillo" && "yellow":
       return "yellow";
-    case "azul":
+    case "azul" && "blue":
       return "blue";
-    case "verde":
+    case "verde" && "green":
       return "green";
-    case "marron":
+    case "marron" && "brown":
       return "brown";
-    // Agrega más casos según sea necesario
     default:
       return "gray";
   }
-};
+}
+
+const CustomAlert = ({ visible, onClose, totalPoints, containerCount }) => (
+  <Modal
+    animationType="slide"
+    transparent={true}
+    visible={visible}
+    onRequestClose={onClose}
+  >
+    <View style={styles.centeredView}>
+      <View style={styles.modalView}>
+        <Text style={styles.modalText}>Puntos Ganados</Text>
+        <Text>Has ganado {totalPoints} puntos por seleccionar {containerCount} contenedores!</Text>
+        <Button onPress={onClose} title="OK" />
+      </View>
+    </View>
+  </Modal>
+);
 
 const IdZonePage = () => {
-  const [containersData, setContainersData] = useState<Container[]>();
+  const [isAlertVisible, setAlertVisible] = useState(false);
+  const { containers } = useLocalSearchParams();
+  const containerColors = containers ? (Array.isArray(containers) ? containers[0] : containers).split(",") : [];
+
+  const handlePress = () => {
+    setAlertVisible(true);
+  };
+
+  const handleCloseAlert = () => {
+    setAlertVisible(false);
+    router.navigate("/");
+  };
+
   return (
-    <View style={styles.colorContainer}>
-      {containersData && containersData.map((subContainer, index) => (
-        <View
-          key={index}
-          style={[
-            styles.roundView,
-            {
-              backgroundColor: getColor(subContainer.idContainer),
-            },
-          ]}
-        ></View>
+    <View style={{ flex: 1, flexDirection: 'column' }}>
+      {containerColors.map((colorName, index) => (
+        <View key={index} style={{ flex: 1, backgroundColor: getColor(colorName.trim()) }} />
       ))}
+      <View style={{ padding: 20 }}>
+        <Button title="Presiona aquí" onPress={handlePress} />
+      </View>
+      <CustomAlert
+        visible={isAlertVisible}
+        onClose={handleCloseAlert}
+        totalPoints={containerColors.length * 10}
+        containerCount={containerColors.length}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: "white", // Fondo del ScrollView
-  },
-  container: {
-    backgroundColor: "#f0f0f0", // Color de fondo de cada contenedor
-    padding: 20, // Espaciado interno
-    marginVertical: 10, // Espacio vertical entre contenedores
-    marginHorizontal: 15, // Margen horizontal
-    borderRadius: 10, // Bordes redondeados
-    shadowColor: "#000", // Color de sombra
-    shadowOffset: { width: 0, height: 1 }, // Desplazamiento de la sombra
-    shadowOpacity: 0.2, // Opacidad de la sombra
-    shadowRadius: 1.41, // Radio de la sombra
-    elevation: 2, // Elevación en Android
-  },
-  containerAll: {
-    height: "100%",
-    width: "100%",
+  centeredView: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 22
   },
-  title: {
-    fontSize: 25, // Tamaño de fuente para el título
-    fontWeight: "bold", // Negrita para el título
-  },
-  description: {
-    fontSize: 20, // Tamaño de fuente para la descripción
-    color: "gray", // Color de la descripción
-  },
-  additionalInfo: {
-    marginTop: 10,
-  },
-  roundView: {
-    width: 50,
-    height: 50,
-    borderRadius: 25, // Esto hace que la vista sea redonda
-    justifyContent: "center",
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
     alignItems: "center",
-    margin: 5, // Espaciado entre las vistas
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
   },
-  colorContainer: {
-    flexDirection: "row", // Alinea los elementos horizontalmente
-    flexWrap: "wrap", // Permite que los elementos se envuelvan en varias líneas si no caben en una sola
-    justifyContent: "center", // Centra los elementos horizontalmente
-    alignItems: "center", // Centra los elementos verticalmente
-    marginTop: 10,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  iconButton: {},
-  titleAndDistance: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  distance: {
-    fontSize: 18,
-    color: "gray",
-    marginLeft: 10, // Espacio entre el título y la distancia
-  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontWeight: "bold"
+  }
 });
 
 export default IdZonePage;

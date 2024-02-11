@@ -88,7 +88,7 @@ export function CameraContextProvider({ children }: PropsWithChildren) {
       const base64Image = await convertImageToBase64(image.uri);
       console.log("base 64");
       try {
-        const response = await fetch("http://192.168.1.33:4000/visionGpt", {
+        const response = await fetch("http://192.168.1.34:4000/visionGpt", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

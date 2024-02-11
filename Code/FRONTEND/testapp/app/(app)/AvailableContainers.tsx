@@ -15,6 +15,7 @@ import { Link, router } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useServerContext } from "../../contexts/ServerContext";
+import { useLocalSearchParams } from "expo-router";
 
 interface Container {
   idContainer: string;
@@ -34,14 +35,15 @@ interface ApiResponse {
 }
 
 const getColor = (idContainer: string) => {
+  console.log(idContainer);
   switch (idContainer) {
-    case "amarillo":
+    case "amarillo" && "Amarillo" && "yellow":
       return "yellow";
-    case "azul":
+    case "azul" && "blue":
       return "blue";
-    case "verde":
+    case "verde" && "green":
       return "green";
-    case "marron":
+    case "marron" && "brown":
       return "brown";
     // Agrega más casos según sea necesario
     default:
@@ -54,6 +56,20 @@ export default function AvailableContainers() {
   const [currentLocation, setCurrentLocation] =
     useState<Location.LocationObject>();
   const [selectedContainers, setSelectedContainers] = useState<number[]>([]); // Tipo explícito aquí
+  const [selectedContainersString, setSelectedContainerString] = useState<
+    string[]
+  >([]);
+  const { containersAvailable } = useLocalSearchParams();
+  let containersArray: string[];
+
+  // Verifica si containersAvailable es un string antes de llamar a split
+  if (typeof containersAvailable === "string") {
+    containersArray = containersAvailable.split(", ");
+  } else {
+    // Si ya es un array, simplemente lo usamos directamente
+    containersArray = containersAvailable;
+  }
+  const { user } = useServerContext();
   // Consulta para obtener la información de los contenedores
   const { loading, error, data } = useQuery<ApiResponse>(
     COORDINATES_CONTAINERS
@@ -148,7 +164,16 @@ export default function AvailableContainers() {
     );
   }
 
-  const toggleContainer = (index: number) => {
+  const toggleContainer = (index: number, idContainer: string) => {
+    setSelectedContainerString((currentSelected) => {
+      if (currentSelected.includes(idContainer)) {
+        // Si ya está seleccionado, lo quitamos
+        return currentSelected.filter((id: string) => id !== idContainer);
+      } else {
+        // Si no está seleccionado, lo agregamos
+        return [...currentSelected, idContainer];
+      }
+    });
     setSelectedContainers((currentSelected) =>
       currentSelected.includes(index)
         ? currentSelected.filter((i) => i !== index)
@@ -156,9 +181,12 @@ export default function AvailableContainers() {
     );
   };
 
-  const handleThrow = () => {
-    console.log("Contenedores seleccionados:", selectedContainers);
-    // Aquí la lógica para "tirar" y ganar puntos
+  const getCheckIconColor = (backgroundColor: string) => {
+    if (backgroundColor === "yellow") {
+      return "black"; // Color negro para contenedores amarillos
+    } else {
+      return "white"; // Color blanco para todos los demás contenedores
+    }
   };
 
   return (
@@ -197,26 +225,34 @@ export default function AvailableContainers() {
                 </Text>
                 <View>
                   <View style={styles.colorContainer}>
-                    {container.containers.map((subContainer, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => toggleContainer(index)}
-                      >
-                        <View
+                    {containersArray.map((subContainer, index) => {
+                      const backgroundColor = getColor(subContainer);
+                      const checkIconColor = getCheckIconColor(backgroundColor); // Determina el color del ícono
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => toggleContainer(index, subContainer)}
                           style={[
                             styles.roundView,
                             {
-                              backgroundColor: getColor(
-                                subContainer.idContainer
-                              ),
+                              backgroundColor: backgroundColor,
                               opacity: selectedContainers.includes(index)
                                 ? 0.5
                                 : 1,
                             },
                           ]}
-                        ></View>
-                      </TouchableOpacity>
-                    ))}
+                        >
+                          {selectedContainers.includes(index) && (
+                            <MaterialIcons
+                              name="check"
+                              size={30}
+                              color={checkIconColor} // Usa el color determinado para el ícono
+                              style={styles.checkIcon}
+                            />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                   {selectedContainers.length > 0 && (
                     <Button
@@ -224,7 +260,12 @@ export default function AvailableContainers() {
                       onPress={() =>
                         router.push({
                           pathname: "/(app)/containers/[id]",
-                          params: { id: container.idZone },
+                          params: {
+                            id: container.idZone,
+                            containers: Array.from(
+                              selectedContainersString
+                            ).join(", "),
+                          },
                         })
                       }
                     />
@@ -274,10 +315,17 @@ const styles = StyleSheet.create({
   roundView: {
     width: 50,
     height: 50,
-    borderRadius: 25, // Esto hace que la vista sea redonda
+    borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-    margin: 5, // Espaciado entre las vistas
+    margin: 5,
+    // Asegura que el contenedor pueda contener otros elementos sin problemas
+    flexDirection: "row", // O 'column' según prefieras
+  },
+
+  checkIcon: {
+    // Posicionamiento del ícono de verificación, si es necesario
+    position: "absolute", // Posiciona el ícono sobre el contenedor
   },
   colorContainer: {
     flexDirection: "row", // Alinea los elementos horizontalmente

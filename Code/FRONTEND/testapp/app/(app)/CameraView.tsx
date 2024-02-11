@@ -103,6 +103,8 @@ const CameraView = () => {
   const { image, setImageUri, gptVisionInfo } = useCameraContext();
   const [showMoreInfo, setShowMoreInfo] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const [contenedoresDisponibles, setContenedoresDisponibles] = useState<string>();
+  let container = "";
 
   const { user } = useAuth();
 
@@ -179,6 +181,8 @@ const CameraView = () => {
     const containerColors = assignColorsToMaterials(
       gptVisionInfo.data.composition
     );
+    const containers = containerColors.map(container => container.idContainer).join(', ');
+    container = containers;
   }
 
   if (!image) {
@@ -210,7 +214,10 @@ const CameraView = () => {
         {gptVisionInfo && (
           <TouchableOpacity
             onPress={() => {
-              router.push("/(app)/AvailableContainers");
+              router.push({
+                pathname: "/(app)/AvailableContainers",
+                params: { containersAvailable: container },
+              })
             }}
             style={[styles.queryButton, isAtBottom && styles.buttonAtBottom]}
           >
