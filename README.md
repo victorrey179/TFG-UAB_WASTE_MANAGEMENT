@@ -11,7 +11,7 @@ BlueCampus es un sistema de gestión de residuos inteligente diseñado para la U
 
  - [Node.js](https://nodejs.org/en)
  - [React (para desarrollo frontend)](https://es.react.dev/)
- - [MongoDB o una base de datos no relacional similar](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project)
+ - [MongoDB o una base de datos no relacional similar](https://www.mongodb.com/es)
  - [Expo](https://expo.dev/)
  - [GraphQL](https://graphql.org/)
  - [ApolloServer](https://www.apollographql.com/docs/apollo-server/)
